@@ -1,0 +1,16 @@
+[flake8]
+ignore =
+    E502,
+    E701,
+    E712,
+    F403,
+    F405,
+    F841
+exclude = 
+    .git,
+    __pycache__,
+    client,
+    server/scripts,
+    server/config/config.py,
+    build,
+    dist

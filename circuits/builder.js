@@ -21,7 +21,7 @@ if (process.argv.length !== 6) {
 const cwd = process.cwd();
 
 for (circuitName of circuitsList.split(',')) {
-  if (!process.env[circuitName + '_beacon']) {
+  if (!process.env['beacon']) {
     console.log('ERROR! you probably dont have an .env file');
     process.exit(1);
   }
@@ -46,7 +46,7 @@ for (circuitName of circuitsList.split(',')) {
         'npx snarkjs zkey beacon circuit_' +
           circuitName +
           '.zkey circuit.zkey ' +
-          process.env[circuitName + '_beacon'] +
+          process.env['beacon'] +
           ' 10',
         { stdio: 'inherit' }
       );
@@ -73,10 +73,12 @@ for (circuitName of circuitsList.split(',')) {
       'npx snarkjs groth16 prove circuit.zkey witness.wtns proof.json public.json',
       { stdio: 'inherit' }
     );
+    /*
     execSync(
       'npx snarkjs groth16 verify verification_key.json public.json proof.json',
       { stdio: 'inherit' }
     );
+    */
     execSync(
       'mkdir -p ../circuits-compiled/' + circuitName,
       { stdio: 'inherit' }

@@ -1,0 +1,1 @@
+const { eddsa } = require('circomlib');

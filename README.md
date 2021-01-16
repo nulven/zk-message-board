@@ -33,7 +33,7 @@ An example of creating and verifying a new proof in Node can be found in `/clien
 2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have a public key `pk` to one of the recorded MiMC hashes.
 3. Then, the user sends an EdDSA signature of the vote and a snark proving that the signature was produced by the private key associated with the public key they just verified.
 
-Valid `EdDSA(sk, msg)`
+Valid `sig = EdDSA(sk, msg)`
 where `pk = private2public(sk)`
 and `H(pk)` is a recorded hash
 

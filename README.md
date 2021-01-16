@@ -30,8 +30,12 @@ An example of creating and verifying a new proof in Node can be found in `/clien
 
 ## How it works
 1. User generates EdDSA key pair `(pk, sk)` and sends the MiMC hash to the server `H(pk)`.
-2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have the public key `pk` to one of the recorded MiMC hashes.
+2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have a public key `pk` to one of the recorded MiMC hashes.
 3. Then, the user sends an EdDSA signature of the vote and a snark proving that the signature was produced by the private key associated with the public key they just verified.
+
+Valid `EdDSA(sk, msg)`
+where `pk = private2public(sk)`
+and `H(pk)` is a recorded hash
 
 ## Poll Database
 All of the poll information is stored locally in `.txt` files.

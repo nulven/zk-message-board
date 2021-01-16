@@ -1,20 +1,23 @@
-export async function calculateProof(preImage, hash) {
-  const { proof, publicSignals } =
-    await snarkjs.groth16.fullProve({ x: preImage, hash: hash.toString() }, "/circuits/circuits-compiled/hash/circuit.wasm", "/circuits/keys/hash/circuit_final.zkey");
+const circuitPath = '/circuits/circuits-compiled/';
+const keyPath = '/circuits/keys/';
 
-    const vKey = await fetch("/circuits/keys/hash/verification_key.json").then(function(res) {
-      return res.json();
-    });
+// HELPERS
+async function prove(circuit, inputs) {
+  // prove that the signature is produced by the private key of the given public key
+  const { proof, publicSignals } = 
+    await snarkjs.groth16.fullProve(
+      inputs,
+      circuitPath + circuit + '/circuit.wasm',
+      keyPath + circuit + '/circuit_final.zkey'
+    );
 
-  const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
-  return res;
+  return { proof, publicSignals };
 }
 
-export async function verifyKey(key, poll) {
-  const { proof, publicSignals } = 
-    await snarkjs.groth16.fullProve({ x: key, hash: poll.users }, "/circuits/circuits-compiled/hash-check/circuit.wasm", "/circuits/keys/hash-check/circuit_final.zkey");
-
-  const vKey = await fetch("/circuits/keys/hash-check/verification_key.json").then(function(res) {
+async function verify(circuit, proof, publicSignals) {
+  const vKey = await fetch(
+    keyPath + circuit + '/verification_key.json'
+  ).then(function(res) {
     return res.json();
   });
 
@@ -22,30 +25,27 @@ export async function verifyKey(key, poll) {
   return res;
 }
 
-export async function proveKey(publicKey, poll) {
-  // prove that you have a public key registered for the poll
-  const { proof, publicSignals } = 
-    await snarkjs.groth16.fullProve({ x: publicKey, hash: poll.users }, "/circuits/circuits-compiled/hash-check/circuit.wasm", "/circuits/keys/hash-check/circuit_final.zkey");
 
-  return { proof, publicSignals };
+// PROVERS
+export async function proveHash(preImage, hash) {
+  return prove('hash', { x: preImage, hash });
 }
 
 export async function proveSignature(publicKey, publicKey2, hashes, sigR8, sig, message) {
   // prove that the signature is produced by the private key of the given public key
-  const { proof, publicSignals } = 
-    await snarkjs.groth16.fullProve({ publicKey, publicKey2, hashes, sigR8, sig, message }, "/circuits/circuits-compiled/sig-check/circuit.wasm", "/circuits/keys/sig-check/circuit_final.zkey");
+  return prove('hash', { publicKey, publicKey2, hashes, sigR8, sig, message });
+}
 
-  return { proof, publicSignals };
+
+// FULL VERIFIERS
+export async function verifyHash(key, hash) {
+  const { proof, publicSignals } = await prove('hash', { x: key, hash: hash });
+
+  return verify('hash', proof, publicSignals);
 }
 
 export async function verifySignature(publicKey, publicKey2, hashes, sigR8, sig, message) {
-  const { proof, publicSignals } = 
-    await snarkjs.groth16.fullProve({ publicKey, publicKey2, hashes, sigR8, sig, message }, "/circuits/circuits-compiled/sig-check/circuit.wasm", "/circuits/keys/sig-check/circuit_final.zkey");
+  const { proof, publicSignals } = await prove('sig-check', { publicKey, publicKey2, hashes, sigR8, sig, message });
 
-  const vKey = await fetch("/circuits/keys/sig-check/verification_key.json").then(function(res) {
-    return res.json();
-  });
-
-  const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
-  return res;
+  return verify('sig-check', proof, publicSignals);
 }

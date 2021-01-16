@@ -1,38 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import TextInput from './shared/components/TextInput';
 import { Button } from './shared/components/Button';
+import { Large } from './shared/components/text';
 
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-`;
-
-const Title = styled.div`
-  height: 30px;
-  font-size: 25px;
-  padding: 5px;
-`;
 
 const Spacer = styled.div`
   height: 30px;
 `;
 
-const Header = styled.p`
-  width: 100px;
-  padding-left: 5px;
-`;
-
-const Output = styled.p`
-  width: 100%;
-`;
-
-const Front = (props) => {
+const Home = (props) => {
 
   const sendToNewPoll = () => {
-    props.history.push('/new-poll');
+    props.history.push('/polls/new');
   };
 
   const sendToPolls = () => {
@@ -42,14 +22,14 @@ const Front = (props) => {
   return (
     <>
       <>
-        <Title>Start a New Poll</Title>
+        <Large>Start a New Poll</Large>
         <Button onClick={sendToNewPoll}>
           New Poll
         </Button>
       </>
       <Spacer />
       <>
-        <Title>Join an Existing Poll</Title>
+        <Large>Join an Existing Poll</Large>
         <Button onClick={sendToPolls}>
           Get Polls
         </Button>
@@ -58,4 +38,4 @@ const Front = (props) => {
   );
 }
 
-export default Front;
+export default Home;

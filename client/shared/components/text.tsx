@@ -60,3 +60,9 @@ export const Large = styled.div`
   font-size: ${props => props.theme.text.large.size};
   line-height: ${props => props.theme.text.large.lineHeight};
 `;
+
+export const Title = styled.div`
+  height: 30px;
+  font-size: 25px;
+  padding: 5px;
+`;

@@ -1,45 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
-import TextInput from './shared/components/TextInput';
-import { Button } from './shared/components/Button';
-
-import mimc from './mimc';
-import { generateKey, signVote } from './utils';
-import { get, post } from './api';
-import { verifyKey, proveKey, proveSignature, verifySignature } from './prover';
-import bigInt from 'big-integer';
+const utils = require("ffjavascript").utils;
 import { babyJub, eddsa } from 'circomlib';
 const { packPoint } = babyJub;
 const { verify } = eddsa;
-const utils = require("ffjavascript").utils;
+
+import TextInput from './shared/components/TextInput';
+import { Button } from './shared/components/Button';
+import { Large } from './shared/components/text';
+
+import bigInt from 'big-integer';
+import mimc from './mimc';
+import { generateKey, signVote } from './utils';
+import { get, post } from './api';
+import { proveSignature, verifyHash, verifySignature } from './prover';
+
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 `;
-
-const Title = styled.div`
-  height: 30px;
-  font-size: 25px;
-  padding: 5px;
-`;
-
-const Spacer = styled.div`
-  height: 30px;
-`;
-
-const Header = styled.p`
-  width: 100px;
-  padding-left: 5px;
-`;
-
-const Output = styled.p`
-  width: 100%;
-`;
-
-
 
 const Poll = (props) => {
   const id = props.match.params.id;
@@ -134,6 +115,7 @@ const Poll = (props) => {
     .then(data => {
       if (data.success) {
         localStorage.setItem(`${id}_hasvoted`, 'true');
+        setHasVoted(true);
       }
     });
   };
@@ -156,7 +138,7 @@ const Poll = (props) => {
     <>
       {!!poll ? 
         <Wrapper>
-          <Title>{poll.title}</Title>
+          <Large>{poll.title}</Large>
           <p>{poll.users.length}/{poll.maxUsers}</p>
         </Wrapper>
       : null}

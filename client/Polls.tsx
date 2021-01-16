@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import TextInput from './shared/components/TextInput';
 import { Button } from './shared/components/Button';
+import { Large } from './shared/components/text';
 
 import { get } from './api';
+
 
 const PollsWrapper = styled.div`
   display: flex;
@@ -25,27 +26,6 @@ const Wrapper = styled.div`
   justify-content: space-between;
 `;
 
-const Title = styled.div`
-  height: 30px;
-  font-size: 25px;
-  padding: 5px;
-`;
-
-const Spacer = styled.div`
-  height: 30px;
-`;
-
-const Header = styled.p`
-  width: 100px;
-  padding-left: 5px;
-`;
-
-const Output = styled.p`
-  width: 100%;
-`;
-
-
-
 type PollProps = {
   id: string;
   title: string;
@@ -57,7 +37,7 @@ type PollProps = {
 const Poll = (props: PollProps) => {
   return (
     <Wrapper onClick={props.onClick}>
-      <Title>{props.title}</Title>
+      <Large>{props.title}</Large>
       <p>{props.users.length}/{props.maxUsers}</p>
     </Wrapper>
   );
@@ -82,12 +62,12 @@ const Polls = (props) => {
   };
 
   const sendToPoll = (id) => () => {
-    props.history.push(`/poll/${id}`);
+    props.history.push(`/polls/${id}`);
   };
 
   return (
     <>
-      <Title>Choose a Poll</Title>
+      <Large>Choose a Poll</Large>
       <PollsWrapper>
         {polls.map((poll) => {
           return <Poll

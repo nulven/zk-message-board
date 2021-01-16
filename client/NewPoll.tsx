@@ -3,18 +3,14 @@ import styled from 'styled-components';
 
 import TextInput from './shared/components/TextInput';
 import { Button } from './shared/components/Button';
+import { Large } from './shared/components/text';
+
 import { post } from './api';
 
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
-`;
-
-const Title = styled.div`
-  height: 30px;
-  font-size: 25px;
-  padding: 5px;
 `;
 
 const Spacer = styled.div`
@@ -24,10 +20,6 @@ const Spacer = styled.div`
 const Header = styled.p`
   width: 100px;
   padding-left: 5px;
-`;
-
-const Output = styled.p`
-  width: 100%;
 `;
 
 
@@ -52,7 +44,7 @@ const NewPoll = (props) => {
 
   return (
     <>
-      <Title>Create Poll</Title>
+      <Large>Create Poll</Large>
       <Wrapper>
         <Header>Title</Header>
         <TextInput

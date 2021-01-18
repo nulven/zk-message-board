@@ -11,6 +11,12 @@ Run the local server
 npm run server
 ```
 
+## Circuits
+| Circuit Name | Private Inputs | Public Inputs | Outputs | Description |
+| ------------ | -------------- | ------------- | ------- | ----------- |
+| `hash`       | `x` | `hash` | `out` | Checks if `MiMC(x) = hash`; outputs `MiMC(x)` |
+| `hash-check` | `key` | `hashes` | None | Checks if `MiMC(x)` is in list `hashes` |
+| `sig-check`  | `publicKey`, `publicKey2` | `hashes`, `sigR8`, `sig`, `message` | None | Checks `eddsa_verify(publicKey, sigR8, sig, message) == true`; checks `MiMIC(publicKey2)` is in list `hashes` (not final design, needs fixing) |
 
 ## Add a circuit
 Make a new directory in `/circuits/` with the name of the circuit.

@@ -5,11 +5,13 @@ dist
 
 polls
 votes
-circuit_compiled
+circuits-compiled
 keys
 
 circuit.r1cs
-circuit_hash.zkey
+*.zkey
+*.wasm
+proof.json
 public.json
 verification_key.json
 witness.wtns

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import mimc from './mimc';
-import { verifyHash } from './prover';
+import mimc from '../utils/mimc';
+import { verifyHash } from '../utils/prover';
 
-import TextInput from './shared/components/TextInput';
-import { Button } from './shared/components/Button';
-import { Large } from './shared/components/text';
+import TextInput from '../components/TextInput';
+import { Button } from '../components/Button';
+import { Large } from '../components/text';
 
 
 const Wrapper = styled.div`

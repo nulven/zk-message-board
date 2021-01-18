@@ -13,7 +13,7 @@ const styledComponentsTransformer = createStyledComponentsTransformer();
 module.exports = {
   mode: 'production',
   entry: {
-    'bundle.js': __dirname + '/client/index.tsx',
+    'bundle.js': __dirname + '/client/src/index.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),

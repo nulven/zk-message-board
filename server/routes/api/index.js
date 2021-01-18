@@ -9,18 +9,20 @@ const {
   getVotes,
   recordVote
 } = require('../../pollDb.js');
+const { verifyKey, verifySignature } = require('../../verifier');
+const { mimcHash } = require('../../mimc.js');
 
 const router = express.Router();
 const jsonParser = bodyParser.json()
 
 
-router.post('/poll/new', jsonParser, async (req, res) => {
+router.post('/polls/new', jsonParser, async (req, res) => {
   const { title, maxUsers } = req.body;
   const polls = await createPoll(title, maxUsers);
   res.send({ success: true, polls });
 });
 
-router.get('/poll/:id', async (req, res) => {
+router.get('/polls/:id', async (req, res) => {
   const id = req.params.id;
   const poll = await getPoll(id);
   const votes = await getVotes(id);
@@ -43,8 +45,12 @@ router.post('/polls/:id/vote', jsonParser, async (req, res) => {
   const { vote, sigProof } = req.body;
   const { proof, publicSignals } = sigProof
   const validSignature = await verifySignature(proof, publicSignals);
-  await recordVote(id, vote, publicSignals[publicSignals.length -2]);
-  res.send({ success: true });
+  if (validSignature) {
+    await recordVote(id, vote, publicSignals[publicSignals.length -2]);
+    res.send({ success: true });
+  } else {
+    res.send({ error: 'Invalid signature' });
+  }
 });
 
 module.exports = {

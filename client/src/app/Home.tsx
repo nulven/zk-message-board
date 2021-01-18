@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button } from './shared/components/Button';
-import { Large } from './shared/components/text';
+import { Button } from '../components/Button';
+import { Large } from '../components/text';
 
 
 const Spacer = styled.div`

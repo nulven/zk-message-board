@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const url = require('url');
 
 const { mimcHash } = require('./mimc.js');
-const { verifyKey, verifySignature } = require('./verifier');
 const config = require('../webpack.config.js');
 
 const { apiRouter } = require('./routes/api');

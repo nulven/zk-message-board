@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import TextInput from './shared/components/TextInput';
-import { Button } from './shared/components/Button';
-import { Large } from './shared/components/text';
+import TextInput from '../components/TextInput';
+import { Button } from '../components/Button';
+import { Large } from '../components/text';
 
-import { post } from './api';
+import { post } from '../utils/api';
 
 
 const Wrapper = styled.div`

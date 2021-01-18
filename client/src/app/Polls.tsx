@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import { Button } from './shared/components/Button';
-import { Large } from './shared/components/text';
+import { Button } from '../components/Button';
+import { Large } from '../components/text';
 
-import { get } from './api';
+import { get } from '../utils/api';
 
 
 const PollsWrapper = styled.div`

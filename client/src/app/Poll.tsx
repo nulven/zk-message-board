@@ -5,15 +5,15 @@ import { babyJub, eddsa } from 'circomlib';
 const { packPoint } = babyJub;
 const { verify } = eddsa;
 
-import TextInput from './shared/components/TextInput';
-import { Button } from './shared/components/Button';
-import { Large } from './shared/components/text';
+import TextInput from '../components/TextInput';
+import { Button } from '../components/Button';
+import { Large } from '../components/text';
 
 import bigInt from 'big-integer';
-import mimc from './mimc';
-import { generateKey, signVote } from './utils';
-import { get, post } from './api';
-import { proveSignature, verifyHash, verifySignature } from './prover';
+import mimc from '../utils/mimc';
+import { generateKey, signVote } from '../utils/utils';
+import { get, post } from '../utils/api';
+import { proveSignature, verifyHash, verifySignature } from '../utils/prover';
 
 
 const Wrapper = styled.div`
@@ -42,7 +42,6 @@ const Poll = (props) => {
     get(`/api/poll/${id}`, {})
     .then(data => {
       if (data.success) {
-        console.log(data.votes);
         setPoll(data.poll);
         setVotes(data.votes);
       } else {
@@ -63,7 +62,7 @@ const Poll = (props) => {
     const pubkeyMaybe = localStorage.getItem(`${id}_pubkey`);
     const prvkeyMaybe = localStorage.getItem(`${id}_prvkey`);
     if (pubkeyMaybe !== null && prvkeyMaybe !== null) {
-      //const verified = await verifyKey(pubkeyMaybe, poll);
+      const verified = await verifyHash(pubkeyMaybe, poll);
       if (true) {
         setPublicKey(pubkeyMaybe.split(',').map(v => BigInt(v)));
         setPrivateKey(prvkeyMaybe);
@@ -107,9 +106,6 @@ const Poll = (props) => {
     console.log('pubKey', parseInt(p.join(''), 2));
 
     const sigProof = await proveSignature(p, publicKey[0], [mimc(publicKey[0]).toString()], r, signature.S, vote);
-    
-    //const veri = await verifySignature(p, publicKey[0], [mimc(publicKey[0]).toString()], r, signature.S, vote);
-    //console.log(veri);
     
     post(`/api/polls/${id}/vote`, { vote, sigProof })
     .then(data => {

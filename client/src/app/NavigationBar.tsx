@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { Medium } from './shared/components/text';
-import type { StyledComponent } from 'styled-components';
+
+import { Medium } from '../components/text';
 
 interface NavBarElementProps {
   active: boolean;
@@ -28,7 +28,6 @@ type NavigationBarElementProps = {
 };
 
 const NavigationBarElement = (props: NavigationBarElementProps) => {
-  console.log(props.activeTab, props.path);
   return (
     <NavBarElementWrapper active={props.activeTab === props.path}>
       <Link to={props.path}>

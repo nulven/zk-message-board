@@ -10,8 +10,3 @@ export function generateKey() {
   const publicKey = prv2pub(privateKey.toString());
   return { publicKey: publicKey, privateKey };
 }
-
-export function signVote(privateKey, vote) {
-  const signature = sign(privateKey.toString(), Buffer.from(vote.toString(), 'utf8'));
-  return signature;
-}

@@ -31,9 +31,9 @@ export async function proveHash(preImage, hash) {
   return prove('hash', { x: preImage, hash });
 }
 
-export async function proveSignature(publicKey, publicKey2, hashes, sigR8, sig, message) {
+export async function proveSignature(publicKey, hashes, sig, message) {
   // prove that the signature is produced by the private key of the given public key
-  return prove('sig-check', { publicKey, publicKey2, hashes, sigR8, sig, message });
+  return prove('sig-check', { publicKey, hashes, sig, message });
 }
 
 

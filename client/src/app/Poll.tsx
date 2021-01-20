@@ -3,7 +3,8 @@ import styled from 'styled-components';
 const utils = require("ffjavascript").utils;
 import { babyJub, eddsa } from 'circomlib';
 const { packPoint } = babyJub;
-const { verify } = eddsa;
+const { verify, packSignature, sign } = eddsa;
+import Loader from 'react-loader-spinner';
 
 import TextInput from '../components/TextInput';
 import { Button } from '../components/Button';
@@ -11,10 +12,20 @@ import { Large } from '../components/text';
 
 import bigInt from 'big-integer';
 import mimc from '../utils/mimc';
-import { generateKey, signVote } from '../utils/utils';
+import { generateKey } from '../utils/utils';
 import { get, post } from '../utils/api';
 import { proveSignature, verifyHash, verifySignature } from '../utils/prover';
 
+
+const SpinnerWrapper = styled.div`
+  display: flex;
+  width: 10%;
+  height: 10%;
+  margin-left: 45%;
+  margin-right: 45%;
+  margin-top: 20%;
+  margin-bottom: 70%;
+`;
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,6 +40,7 @@ const Poll = (props) => {
   const [publicKey, setPublicKey] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     loadPoll();
@@ -39,7 +51,7 @@ const Poll = (props) => {
   }, [poll]);
 
   const loadPoll = () => {
-    get(`/api/poll/${id}`, {})
+    get(`/api/polls/${id}`, {})
     .then(data => {
       if (data.success) {
         setPoll(data.poll);
@@ -53,6 +65,12 @@ const Poll = (props) => {
   const maxUsers = !!poll ? poll.users.length === parseInt(poll.maxUsers) : false;
   const allVoted = !!votes ? votes.ones + votes.zeros === parseInt(poll.maxUsers) : false;
 
+  const generate = !hasVoted && !maxUsers && !publicKey;
+  const waiting = hasVoted && !allVoted;
+  const waitingNotRegistered = maxUsers && !allVoted && !publicKey;
+  const voting = !hasVoted && !!publicKey;
+  const tally = allVoted && (hasVoted || maxUsers);
+
   const loadKey = async () => {
     const hasVoted = localStorage.getItem(`${id}_hasvoted`);
     if (hasVoted === 'true') {
@@ -62,7 +80,7 @@ const Poll = (props) => {
     const pubkeyMaybe = localStorage.getItem(`${id}_pubkey`);
     const prvkeyMaybe = localStorage.getItem(`${id}_prvkey`);
     if (pubkeyMaybe !== null && prvkeyMaybe !== null) {
-      const verified = await verifyHash(pubkeyMaybe, poll);
+      //const verified = await verifyHash(pubkeyMaybe, poll);
       if (true) {
         setPublicKey(pubkeyMaybe.split(',').map(v => BigInt(v)));
         setPrivateKey(prvkeyMaybe);
@@ -72,53 +90,85 @@ const Poll = (props) => {
     }
   };
 
+  function buffer2bits(buff) {
+    const res = [];
+    for (let i = 0; i < buff.length; i++) {
+      for (let j = 0; j < 8; j++) {
+        if ((buff[i] >> j) & 1) {
+          res.push('1');
+        } else {
+          res.push('0');
+        }
+      }
+    }
+    return res;
+  }
+
   const sendVote = (bit) => async () => {
-    const vote = mimc(bit).toString();
-    console.log(typeof publicKey[0]);
-    console.log(publicKey[0]);
-    const signature = signVote(privateKey, vote);
+    setSending(true);
+    const vote = mimc(bit).toString().padStart(78, '0');
+    const msg = Buffer.from(vote, 'hex');
+    const pPubKey = packPoint(publicKey);
+    const signature = sign(privateKey, msg);
+    const pSignature = packSignature(signature);
+
+    const msgBits = buffer2bits(msg);
+    const rBits = buffer2bits(pSignature.slice(0, 32));
+    const sBits = buffer2bits(pSignature.slice(32, 64));
+    const aBits = buffer2bits(pPubKey);
+
+    const hash = mimc(...aBits).toString();
   
-    const v = bigInt(parseInt(Buffer.from(vote).toString('hex'), 16));
-    const ver = verify(Buffer.from(vote), signature, publicKey);
-    console.log('Verified', ver);
-
-    console.log('Vote', vote);
-    console.log('Sig', signature.S);
-    const s = signature.S.toString(2);
-    console.log('sig', s);
-
-    const r8 = packPoint(signature.R8);
-    const r = [];
-    r8.forEach(v => {
-      const l = v.toString(2);
-      const x = "00000000".substr(l.length) + l;
-      r.push(... x.split(''));
-    });
-    console.log('R8', r);
-
-    const pk = packPoint(publicKey);
-    const p = [];
-    pk.forEach(v => {
-      const l = v.toString(2);
-      const x = "00000000".substr(l.length) + l;
-      p.push(... x.split(''));
-    });
-    console.log('pubKey', parseInt(p.join(''), 2));
-
-    const sigProof = await proveSignature(p, publicKey[0], [mimc(publicKey[0]).toString()], r, signature.S, vote);
-    
-    post(`/api/polls/${id}/vote`, { vote, sigProof })
+    const sigProof = await proveSignature(aBits, poll.users, [rBits, sBits], msgBits);
+ 
+    post(`/api/polls/${id}/vote`, { sigProof })
     .then(data => {
       if (data.success) {
         localStorage.setItem(`${id}_hasvoted`, 'true');
         setHasVoted(true);
+      } else {
+        console.log(data.error);
       }
+      setSending(false);
     });
+  };
+
+  const Spinner = () => {
+    return (
+      <SpinnerWrapper>
+        <Loader type="Oval" />
+      </SpinnerWrapper>
+    );
+  };
+
+  const Tally = () => {
+    return (
+      <>
+        <p>Ones: {votes.ones}</p>
+        <p>Zeros: {votes.zeros}</p>
+      </>
+    );
+  };
+
+  const Voting = () => {
+    return (
+      <>
+        <p>You have a valid key</p>
+        <Button onClick={sendVote(0)}>
+          0
+        </Button>
+        <Button onClick={sendVote(1)}>
+          1
+        </Button>
+      </>
+    );
   };
 
   const register = () => {
     const { publicKey, privateKey } = generateKey();
-    const pubKeyHash = mimc(publicKey[0]).toString();
+    const pPubKey = packPoint(publicKey);
+    const pubKeyBits = buffer2bits(pPubKey);
+    const pubKeyHash = mimc(...pubKeyBits).toString();
     post('/api/polls/register_key', { id, keyHash: pubKeyHash })
     .then(data => {
       if (data.success) {
@@ -138,44 +188,21 @@ const Poll = (props) => {
           <p>{poll.users.length}/{poll.maxUsers}</p>
         </Wrapper>
       : null}
-      {!!publicKey ? (
-        hasVoted ? (
-          (allVoted) ?
-            <>
-              <p>Ones: {votes.ones}</p>
-              <p>Zeros: {votes.zeros}</p>
-            </>
-          :
-            <>
-              <p>You have already voted</p>
-            </>
-        ) : (
-          <>
-            <p>You have a valid key</p>
-            <Button onClick={sendVote(0)}>
-              0
+      {!sending ?
+        <>
+          {generate ? 
+            <Button onClick={register}>
+              Generate key
             </Button>
-            <Button onClick={sendVote(1)}>
-              1
-            </Button>
-          </>
-        )
-      ) : (
-        maxUsers ?
-          allVoted ?
-            <>
-              <p>Ones: {votes.ones}</p>
-              <p>Zeros: {votes.zeros}</p>
-            </>
-          :
-            <>
-              <p>This poll is full, wait for the other users to vote to see the results of the poll</p>
-            </>
-        :
-          <Button onClick={register}>
-            Generate key
-          </Button>
-      )}
+          : null}
+          {tally ? <Tally /> : null}
+          {voting ? <Voting /> : null}
+          {waiting ? <p>You have already voted</p> : null}
+          {waitingNotRegistered ?
+            <p>This poll is full, wait for the other users to vote to see the results of the poll</p>
+          : null}
+        </>
+      : <Spinner />}
     </>
   );
 }

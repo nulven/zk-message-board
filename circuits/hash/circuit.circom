@@ -1,6 +1,5 @@
 include "../../node_modules/circomlib/circuits/mimcsponge.circom"
 
-
 template Main() {
   signal private input x;
   signal input hash;

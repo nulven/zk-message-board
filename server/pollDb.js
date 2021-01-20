@@ -3,6 +3,7 @@ const path = require('path');
 
 const { mimcHash } = require('./mimc.js');
 
+
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -11,7 +12,7 @@ function uuidv4() {
 }
 
 function parsePoll(data) {
-  var lines = data.split('\n');
+  var lines = data.split('\n').filter(v => v !== '');
   const [id, title, maxUsers] = lines[0].split(',');
   lines = lines.filter(line => line !== '');
   const users = lines.slice(1);
@@ -24,9 +25,9 @@ function parseVotes(data) {
   let ones = 0;
   let zeros = 0;
   votes.forEach(vote => {
-    if (vote === mimcHash(1).toString()) {
+    if (vote === processVote(1)) {
       ones += 1;
-    } else {
+    } else if (vote === processVote(0)) {
       zeros += 1;
     }
   });
@@ -42,6 +43,50 @@ function createPoll(title, maxUsers) {
 
 function addUser(pollId, userHash) {
   fs.appendFile(__dirname + '/polls/' + pollId + '.txt', userHash + '\n', err => {});
+}
+
+function buffer2bits(buff) {
+  const res = [];
+  for (let i = 0; i < buff.length; i++) {
+    for (let j = 0; j < 8; j++) {
+      if ((buff[i] >> j) & 1) {
+        res.push('1');
+      } else {
+        res.push('0');
+      }
+    }
+  }
+  return res;
+}
+
+function processVote(bit) {
+  const hash = mimcHash(bit).toString().padStart(78, '0');
+  const buffer = Buffer.from(hash, 'hex');
+  return buffer2bits(buffer).join('');
+}
+
+async function recordVote(pollId, vote, signature) {
+  if (vote !== processVote(1) && vote !== processVote(0)) {
+    throw new Error('Invalid vote');
+  }
+  const line = vote + ',' + signature + '\n';
+  fs.appendFile(__dirname + '/votes/' + pollId + '.txt', line, err => {});
+}
+
+async function getPoll(pollId) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(__dirname + '/polls/' + pollId + '.txt', (err, data) => {
+      resolve(parsePoll(data.toString()));
+    });
+  });
+}
+
+async function getVotes(pollId) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(__dirname + '/votes/' + pollId + '.txt', (err, data) => {
+      resolve(parseVotes(data.toString()));
+    });
+  });
 }
 
 async function getPolls() {
@@ -64,35 +109,11 @@ async function getPolls() {
   });
 }
 
-async function getPoll(pollId) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(__dirname + '/polls/' + pollId + '.txt', (err, data) => {
-      resolve(parsePoll(data.toString()));
-    });
-  });
-}
-
-async function recordVote(pollId, vote, signature) {
-  if (vote !== mimcHash(1).toString() && vote !== mimcHash(0).toString()) {
-    throw new Error('Invalid vote');
-  }
-  const line = vote + ',' + signature + '\n';
-  fs.appendFile(__dirname + '/votes/' + pollId + '.txt', line, err => {});
-}
-
-async function getVotes(pollId) {
-  return new Promise((resolve, reject) => {
-    fs.readFile(__dirname + '/votes/' + pollId + '.txt', (err, data) => {
-      resolve(parseVotes(data.toString()));
-    });
-  });
-}
-
 module.exports = {
-  createPoll,
   addUser,
-  getPolls,
+  createPoll,
   getPoll,
-  recordVote,
-  getVotes
+  getPolls,
+  getVotes,
+  recordVote
 }

@@ -1,8 +1,10 @@
 include "../../node_modules/circomlib/circuits/mimcsponge.circom"
 
+// 0 == (H(pk) - H(pk_1))*...*(H(pk) - H(pk_n))
+// Only true if pk == pk_i
 
 template HashCheck(n) {
-  signal input key;
+  signal private input key;
   signal input hashes[n];
 
   component mimc = MiMCSponge(1, 220, 1);

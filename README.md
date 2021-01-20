@@ -6,11 +6,70 @@ Use Node v14
 npm install
 ```
 
-Run the local server
+Run the local server and client watcher
 ```
-npm run server
+npm run dev
 ```
 
+## Circuits
+| Circuit Name | Private Inputs | Public Inputs | Outputs | Description |
+| ------------ | -------------- | ------------- | ------- | ----------- |
+| `hash`       | `x` | `hash` | `out` | Checks if `MiMC(x) = hash`; outputs `MiMC(x)` |
+| `hash-check` | `key` | `hashes` | None | Checks if `MiMC(x)` is in list `hashes` |
+| `sig-check`  | `publicKey` | `hashes`, `sig`, `message` | None | Checks `eddsa_verify(publicKey, sig, message) == true`; checks `MiMIC(publicKey)` is in list `hashes` |
+
+### 'sig-check'
+| Inputs | Private | Type | Description |
+| ------ | ------- | ---- | ----------- |
+| 'publicKey' | Yes | 256-bit | EdDSA public key |
+| 'hashes' | No | `[]` | Registered public key hashes |
+| 'sig' | No | 2-by-256-bit array | EdDSA signature |
+| 'message' | No | 312-bit array | binary representation of the MiMC hash of the message |
+
+
+Example use
+```
+import { babyJub, eddsa } from 'circomlib';
+import mimc from 'client/utils/mimc';
+
+function buffer2bits(buff) {
+    const res = [];
+    for (let i=0; i<buff.length; i++) {
+        for (let j=0; j<8; j++) {
+            if ((buff[i]>>j)&1) {
+                res.push('1');
+            } else {
+                res.push('0');
+            }
+        }
+    }
+    return res;
+}
+
+const message = mimc(1234).toString().padStart(78, '0');
+const msg = Buffer.from(message, "hex");
+
+const prvKey = Buffer.from("0001020304050607080900010203040506070809000102030405060708090001", "hex");
+
+const pubKey = eddsa.prv2pub(prvKey);
+
+const pPubKey = babyJub.packPoint(pubKey);
+
+const signature = eddsa.sign(prvKey, msg);
+
+const pSignature = eddsa.packSignature(signature);
+
+const aBits = buffer2bits(pPubKey);
+const rBits = buffer2bits(pSignature.slice(0, 32));
+const sBits = buffer2bits(pSignature.slice(32, 64));
+const msgBits = buffer2bits(msg);
+
+const sig = [rBits, sBits];
+
+const hash = mimc(...aBits).toString();
+
+const inputs = { publicKey: aBits, hashes: [hash], signature: sig, message: msgBits };
+ ```
 
 ## Add a circuit
 Make a new directory in `/circuits/` with the name of the circuit.

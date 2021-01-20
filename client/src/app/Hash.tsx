@@ -35,6 +35,8 @@ const Page = (props) => {
   const [result, setResult] = useState(null);
 
   const handleEnterHash = async () => {
+    console.log(preImage1);
+    console.log(typeof preImage1);
     const out = mimc(preImage1);
     setHashOut(out.toString());
     setHashIn(out.toString());

@@ -72,6 +72,7 @@ const Polls = (props) => {
         {polls.map((poll) => {
           return <Poll
             {...poll}
+            key={poll.id}
             onClick={sendToPoll(poll.id)}
           />;
         })}

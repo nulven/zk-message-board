@@ -34,8 +34,12 @@ const NewPoll = (props) => {
   const [maxUsers, setMaxUsers] = useState(null);
 
   const create = () => {
-    post('/api/poll/new', { title, maxUsers });
-    props.history.push('/polls');
+    post('/api/polls/new', { title, maxUsers })
+    .then(data => {
+      if (data.success) {
+        props.history.push('/polls');
+      }
+    });
   };
 
   const onChange = (stateSetter) => (value) => {

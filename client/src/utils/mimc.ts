@@ -284,16 +284,16 @@ export const modPBigInt = (x: number) => {
 };
 
 export const modPBigIntNative = (x: BigInteger) => {
-  let ret = x.mod(p);
+  let ret = bigInt(x).mod(p);
   if (ret.lesser(bigInt(0))) {
     ret = ret.add(p);
   }
   return ret;
 };
 
-export const mimcWithRounds = (rounds: number) => (...inputs: number[]) =>
+export const mimcWithRounds = (rounds: any) => (...inputs: any[]) =>
   mimcSponge(
-    inputs.map((n) => modPBigInt(n)),
+    inputs.map((n) => modPBigIntNative(n)),
     1,
     rounds
   )[0];

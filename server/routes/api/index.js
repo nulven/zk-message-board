@@ -42,8 +42,10 @@ router.post('/polls/register_key', jsonParser, async (req, res) => {
 
 router.post('/polls/:id/vote', jsonParser, async (req, res) => {
   const id = req.params.id;
-  const { vote, sigProof } = req.body;
+  const { sigProof } = req.body;
   const { proof, publicSignals } = sigProof
+  const voteBits = publicSignals.slice(publicSignals.length-312, publicSignals.length);
+  const vote = voteBits.join('');
   const validSignature = await verifySignature(proof, publicSignals);
   if (validSignature) {
     await recordVote(id, vote, publicSignals[publicSignals.length -2]);

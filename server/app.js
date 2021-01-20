@@ -23,10 +23,7 @@ if (!fs.existsSync(__dirname + '/votes')) {
   fs.mkdirSync(__dirname + '/votes');
 }
 
-app.use(webpackDevMiddleware(compiler, {
-  publicPath: '/'
-}))
-app.use(express.static(__dirname + '/../'));
+app.use('/', express.static(__dirname + '/../'));
 
 app.use('/api', apiRouter);
 app.use('/', router);

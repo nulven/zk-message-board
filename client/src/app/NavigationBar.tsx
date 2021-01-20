@@ -72,6 +72,16 @@ const NavigationBar = (props: NavigationBarProps) => {
         title='Hash'
         activeTab={props.activeTab}
       />
+      <NavigationBarElement
+        path='/groups'
+        title='Groups'
+        activeTab={props.activeTab}
+      />
+      <NavigationBarElement
+        path='/confessions'
+        title='Confessions'
+        activeTab={props.activeTab}
+      />
     </NavigationBarWrapper>
   );
 }

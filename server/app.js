@@ -22,6 +22,15 @@ if (!fs.existsSync(__dirname + '/polls')) {
 if (!fs.existsSync(__dirname + '/votes')) {
   fs.mkdirSync(__dirname + '/votes');
 }
+if (!fs.existsSync(__dirname + '/data')) {
+  fs.mkdirSync(__dirname + '/data');
+}
+if (!fs.existsSync(__dirname + '/data/confessions')) {
+  fs.mkdirSync(__dirname + '/data/confessions');
+}
+if (!fs.existsSync(__dirname + '/data/groups')) {
+  fs.mkdirSync(__dirname + '/data/groups');
+}
 
 app.use(webpackDevMiddleware(compiler, {
   publicPath: '/'

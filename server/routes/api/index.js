@@ -32,15 +32,15 @@ router.post('/groups/create', jsonParser, async (req, res) => {
 });
 
 router.post('/groups/register', jsonParser, async (req, res) => {
-  const { id, keyHash, proof } = req.body;
+  const { groupId, keyHash, proof, publicSignals } = req.body;
   // TODO: verify password
-  await addGroupMember(id, keyHash);
-  res.send({ success: true });
+  await addGroupMember(groupId, keyHash);
+  res.send({ success: true, confession });
 });
 
 router.post('/confessions/post', jsonParser, async (req, res) => {
-  const { message, proof, group } = req.body;
-  const confession = await recordConfession(message, proof.proof, proof.publicSignals, group);
+  const { message, proof, publicSignals } = req.body;
+  const confession = await recordConfession(message, proof, publicSignals);
   res.send({ success: true, confession });
 });
 
@@ -58,8 +58,7 @@ router.get('/groups/:id', async (req, res) => {
 
 router.get('/confessions', jsonParser, async (req, res) => {
   const confessions = await getConfessions();
-  const confessionsSorted = confessions.sort((a, b) => b.date - a.date);
-  res.send({ success: true, confessions: confessionsSorted });
+  res.send({ success: true, confessions });
 });
 
 router.get('/groups', jsonParser, async (req, res) => {

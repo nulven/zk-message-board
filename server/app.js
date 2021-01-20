@@ -32,10 +32,7 @@ if (!fs.existsSync(__dirname + '/data/groups')) {
   fs.mkdirSync(__dirname + '/data/groups');
 }
 
-app.use(webpackDevMiddleware(compiler, {
-  publicPath: '/'
-}))
-app.use(express.static(__dirname + '/../'));
+app.use('/', express.static(__dirname + '/../'));
 
 app.use('/api', apiRouter);
 app.use('/', router);

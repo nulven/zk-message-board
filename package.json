@@ -10,7 +10,6 @@
     "client": "$(npm bin)/webpack --mode development --watch",
     "dev": "$(npm bin)/concurrently \"npm run client\" \"npm run server\"",
     "compile": "node ./circuits/builder.js circuits-compiled keys true"
-
   },
   "repository": {
     "type": "git",
@@ -67,6 +66,7 @@
     "react-router": "5.0.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.1",
+    "react-scroll": "^1.8.1",
     "react-toastify": "^6.0.8",
     "react-toggle": "4.0.2",
     "snarkjs": "^0.3.51",

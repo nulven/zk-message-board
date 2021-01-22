@@ -11,6 +11,7 @@ keys
 circuit.r1cs
 *.zkey
 *.wasm
+*.ptau
 proof.json
 public.json
 verification_key.json

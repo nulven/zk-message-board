@@ -15,7 +15,7 @@ npm run dev
 | Circuit Name | Private Inputs | Public Inputs | Outputs | Description |
 | ------------ | -------------- | ------------- | ------- | ----------- |
 | `hash`       | `x` | `hash` | `out` | Checks if `MiMC(x) = hash`; outputs `MiMC(x)` |
-| `hash-check` | `key` | `hashes` | None | Checks if `MiMC(x)` is in list `hashes` |
+| `hash-check` | `key` | `hashes` | None | Checks if `MiMC(key)` is in list `hashes` |
 | `sig-check`  | `publicKey` | `hashes`, `sig`, `message` | None | Checks `eddsa_verify(publicKey, sig, message) == true`; checks `MiMIC(publicKey)` is in list `hashes` |
 
 ### 'sig-check'
@@ -71,14 +71,15 @@ const hash = mimc(...aBits).toString();
 const inputs = { publicKey: aBits, hashes: [hash], signature: sig, message: msgBits };
  ```
 
-## Add a circuit
+## Add/Compile a circuit
 Make a new directory in `/circuits/` with the name of the circuit.
 
-Copy the `pot15_final.ptau` file from `/circuits/hash` into the new directory.
+Download a powers of tau file from here [https://www.dropbox.com/sh/mn47gnepqu88mzl/AACaJkBU7mmCq8uU8ml0-0fma?dl=0]. The index of the file refers to the number of cycles run. Each cycle increases the number of wires that the SNARK will be able to use. Therefore, a larger cycle will allow you to make more complex circuits, but will take longer to compile (`sig-check` requires 20 cycles, but the rest will work with 15). Move the file into `/circuits/pot/pot[CYCLES]_final.ptau`.
 
 In the new directory, create `circuit.circom` and `input.json` with the test inputs.
 
-Run `npm run compile CIRCUIT_NAME`.
+Run `npm run compile CIRCUIT_NAME CYCLES`.
+The `CYCLES` parameter will choose which `ptau` file to use. It will default to `15`.
 If the circuit and input produce a valid proof you should see `OK`.
 
 The compiled `circuit.wasm` file will be in `/circuits/circuits-compiled/CIRCUIT_NAME`.

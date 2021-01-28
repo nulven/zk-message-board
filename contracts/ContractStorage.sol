@@ -6,7 +6,17 @@ contract ContractStorage {
   //////////////
   ///  VARS  ///
   //////////////
-  mapping(bytes32 => bool) public hashIsVerified; // public auto assigns a getter
-  mapping(string => uint256[]) public registeredHashes; // public auto assigns a getter
-  uint256 public pfsVerified;
+  struct Message {
+    string text;
+    bool verified;
+  }
+  mapping(uint => Message) public confessions;
+  uint[] confessionIds;
+
+  struct Group {
+    string passwordHash;
+    uint256[] users;
+  }
+  mapping(string => Group) public groups;
+  uint[] groupIds;
 }

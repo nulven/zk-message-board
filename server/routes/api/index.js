@@ -9,6 +9,7 @@ const {
   getVotes,
   recordVote,
 } = require("../../pollDb.js");
+/*
 const {
   addGroupMember,
   createGroup,
@@ -18,24 +19,33 @@ const {
   getConfession,
   getConfessions,
 } = require("../../confessionsDb.js");
+*/
+const {
+  addGroupMember,
+  createGroup,
+  recordConfession,
+  getGroups,
+  getConfessions,
+} = require("../../ethAPI.js");
 const { verifyKey, verifySignature } = require("../../verifier");
 const { mimcHash } = require("../../mimc.js");
-const { connect } = require("../../ethAPI.js");
 
 const router = express.Router();
 const jsonParser = bodyParser.json();
 
 router.post("/groups/create", jsonParser, async (req, res) => {
   const { name } = req.body;
-  const { id, password } = await createGroup(name);
-  res.send({ success: true, id, password });
+  //const { id, password } = await createGroup(name);
+  const { password } = await creategroup(name);
+  res.send({ success: true, password });
 });
 
 router.post("/groups/register", jsonParser, async (req, res) => {
-  const { id, keyHash, proof } = req.body;
-  // TODO: verify password
-  await addGroupMember(id, keyHash);
-  res.send({ success: true });
+  //const { id, keyHash, proof } = req.body;
+  const { name, keyHash, passwordHash, keyProof, passwordProof } = req.body;
+  // await addGroupMember(id, keyHash);
+  const registration = await addGroupMember(name, keyHash, passwordHash, keyProof, passwordProof);
+  res.send({ success: registration });
 });
 
 router.post("/confessions/post", jsonParser, async (req, res) => {
@@ -49,22 +59,26 @@ router.post("/confessions/post", jsonParser, async (req, res) => {
   res.send({ success: true, confession });
 });
 
+/*
 router.get("/confessions/:id", async (req, res) => {
   const id = req.params.id;
   const confession = await getConfession(id);
   res.send({ success: true, confession });
 });
+*/
 
+/*
 router.get("/groups/:id", async (req, res) => {
   const id = req.params.id;
   const group = await getGroup(id);
   res.send({ success: true, group });
 });
+*/
 
 router.get("/confessions", jsonParser, async (req, res) => {
   const confessions = await getConfessions();
-  const confessionsSorted = confessions.sort((a, b) => b.date - a.date);
-  res.send({ success: true, confessions: confessionsSorted });
+  // const confessionsSorted = confessions.sort((a, b) => b.date - a.date);
+  res.send({ success: true, confessions });
 });
 
 router.get("/groups", jsonParser, async (req, res) => {

@@ -11,9 +11,9 @@ import { Large } from '../components/text';
 
 import bigInt from 'big-integer';
 import mimc from '../utils/mimc';
-import { generateKey, signVote } from '../utils/utils';
+import { generateKey } from '../utils/utils';
 import { get, post } from '../utils/api';
-import { proveSignature, verifyHash, verifySignature } from '../utils/prover';
+import { proveHash } from '../utils/prover';
 
 
 const Wrapper = styled.div`
@@ -25,6 +25,7 @@ const Wrapper = styled.div`
 const Group = (props) => {
   const id = props.match.params.id;
   const [group, setGroup] = useState(null);
+  const [password, setPassword] = useState(null);
   const [publicKey, setPublicKey] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
 
@@ -60,18 +61,30 @@ const Group = (props) => {
     }
   };
 
-  const register = () => {
-    const { publicKey, privateKey } = generateKey();
-    const pubKeyHash = mimc(publicKey[0]).toString();
-    post('/api/groups/register', { id, keyHash: pubKeyHash })
-    .then(data => {
-      if (data.success) {
-        localStorage.setItem(`${id}_pubkey`, publicKey);
-        localStorage.setItem(`${id}_prvkey`, privateKey.toString());
-        setPublicKey(publicKey);
-        setPrivateKey(privateKey.toString());
-      }
-    });
+  const register = async () => {
+    const passwordHash = mimc(password).toString();
+    if (passwordHash === group.passwordHash) {
+      const proof = await proveHash(password, group.passwordHash);
+
+      const { publicKey, privateKey } = generateKey();
+      const pubKeyHash = mimc(publicKey[0]).toString();
+      post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem(`publicKey`, publicKey);
+          localStorage.setItem(`privateKey`, privateKey.toString());
+          localStorage.setItem(`groupId`, group.id);
+          setPublicKey(publicKey);
+          setPrivateKey(privateKey.toString());
+        }
+      });
+    } else {
+      console.log('Incorrect password');
+    }
+  };
+
+  const onChange = (stateSetter) => (value) => {
+    stateSetter(value);
   };
 
   return (
@@ -83,6 +96,14 @@ const Group = (props) => {
           <>
             <p>{group.name}</p>
             <p>Password hash is: {group.passwordHash}</p>
+            <TextInput
+              placeholder={null}
+              onChange={onChange(setPassword)}
+              value={password}
+            />
+            <Button onClick={register}>
+              Generate key
+            </Button>
           </>
       ) :
         <p>Group not ready</p>

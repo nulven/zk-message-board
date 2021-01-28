@@ -7,15 +7,20 @@ const wasmOutPath = process.argv[2];
 const zkeyOutPath = process.argv[3];
 const deterministic = process.argv[4] === 'true';
 const circuitsList = process.argv[5];
+let potFile = process.argv[6];
 
 // TODO: add an option to generate with entropy for production keys
 
-if (process.argv.length !== 6) {
+if (process.argv.length !== 7) {
   console.log('usage');
   console.log(
     'builder comma,seperated,list,of,circuits wasm_out_path zkey_out_path [`true` if deterministic / `false` if not]'
   );
   process.exit(1);
+}
+
+if (!potFile) {
+  potFile = '15';
 }
 
 const cwd = process.cwd();
@@ -36,7 +41,7 @@ for (circuitName of circuitsList.split(',')) {
     });
     execSync('npx snarkjs r1cs info circuit.r1cs', { stdio: 'inherit' });
     execSync(
-      'npx snarkjs zkey new circuit.r1cs pot15_final.ptau circuit_' +
+      'npx snarkjs zkey new circuit.r1cs "' + __dirname + '/pots/pot' + potFile + '_final.ptau" circuit_' +
         circuitName +
         '.zkey',
       { stdio: 'inherit' }

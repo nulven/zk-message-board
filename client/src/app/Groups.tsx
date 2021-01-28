@@ -64,7 +64,7 @@ const Groups = (props) => {
     props.history.push(`/groups/${id}`);
   };
 
-  const sendToNewGroup = (id) => () => {
+  const sendToNewGroup = () => {
     props.history.push(`/groups/new`);
   };
 

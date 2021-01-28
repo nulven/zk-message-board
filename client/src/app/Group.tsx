@@ -23,34 +23,19 @@ const Wrapper = styled.div`
 `;
 
 const Group = (props) => {
-  const id = props.match.params.id;
-  const [group, setGroup] = useState(null);
+  const name = props.match.params.name;
+  const group = props.location.state.group;
   const [password, setPassword] = useState(null);
   const [publicKey, setPublicKey] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
 
   useEffect(() => {
-    loadGroup();
+    loadKey();
   }, []);
 
-  useEffect(() => {
-    loadKey();
-  }, [group]);
-
-  const loadGroup = () => {
-    get(`/api/groups/${id}`, {})
-    .then(data => {
-      if (data.success) {
-        setGroup(data.group);
-      } else {
-        window.alert('Error');
-      }
-    });
-  };
-
   const loadKey = async () => {
-    const publicKeyMaybe = localStorage.getItem(`${id}_pubkey`);
-    const privateKeyMaybe = localStorage.getItem(`${id}_prvkey`);
+    const publicKeyMaybe = localStorage.getItem(`${name}_pubkey`);
+    const privateKeyMaybe = localStorage.getItem(`${name}_prvkey`);
     if (publicKeyMaybe !== null && privateKeyMaybe !== null) {
       if (true) {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
@@ -64,16 +49,25 @@ const Group = (props) => {
   const register = async () => {
     const passwordHash = mimc(password).toString();
     if (passwordHash === group.passwordHash) {
-      const proof = await proveHash(password, group.passwordHash);
+      const keyProof = await proveHash(password, group.passwordHash);
 
       const { publicKey, privateKey } = generateKey();
-      const pubKeyHash = mimc(publicKey[0]).toString();
-      post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
+      const pubKeyHash = mimc(publicKey[0]).toString(); // fix
+      const passwordProof = await proveHash(publicKey, pubKeyHash);
+
+      //post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
+      post('/api/groups/register', {
+        name,
+        keyHash: pubKeyHash,
+        passwordHash: group.passwordHash,
+        keyProof: keyProof.proof,
+        passwordProof: passwordProof.proof
+      })
       .then(data => {
         if (data.success) {
           localStorage.setItem(`publicKey`, publicKey);
           localStorage.setItem(`privateKey`, privateKey.toString());
-          localStorage.setItem(`groupId`, group.id);
+          localStorage.setItem(`group`, name); // check
           setPublicKey(publicKey);
           setPrivateKey(privateKey.toString());
         }
@@ -94,7 +88,7 @@ const Group = (props) => {
           <p>You are a part of this group</p>
         :
           <>
-            <p>{group.name}</p>
+            <p>{name}</p>
             <p>Password hash is: {group.passwordHash}</p>
             <TextInput
               placeholder={null}

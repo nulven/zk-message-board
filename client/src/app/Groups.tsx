@@ -60,8 +60,11 @@ const Groups = (props) => {
     });
   };
 
-  const sendToGroup = (id) => () => {
-    props.history.push(`/groups/${id}`);
+  const sendToGroup = (group) => () => {
+    props.history.push({
+      pathname: `/groups/${group.name}`,
+      state: { group }
+    });
   };
 
   const sendToNewGroup = () => {
@@ -78,7 +81,7 @@ const Groups = (props) => {
         {groups.map((group) => {
           return <Group
             {...group}
-            onClick={sendToGroup(group.id)}
+            onClick={sendToGroup(group)}
           />;
         })}
       </GroupsWrapper>

@@ -106,6 +106,7 @@ const Poll = (props) => {
 
   const sendVote = (bit) => async () => {
     setSending(true);
+
     const vote = mimc(bit).toString().padStart(78, '0');
     const msg = Buffer.from(vote, 'hex');
     const pPubKey = packPoint(publicKey);

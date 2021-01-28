@@ -8,7 +8,6 @@ template Main(n) {
   signal input sig[2][256];
   signal input message[312];
 
-
   var i;
   component mimc = MiMCSponge(256, 220, 1);
   for (i=0; i<256; i++) {

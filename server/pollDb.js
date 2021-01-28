@@ -76,7 +76,11 @@ async function recordVote(pollId, vote, signature) {
 async function getPoll(pollId) {
   return new Promise((resolve, reject) => {
     fs.readFile(__dirname + '/polls/' + pollId + '.txt', (err, data) => {
-      resolve(parsePoll(data.toString()));
+      if (!!err) {
+        resolve(null);
+      } else {
+        resolve(parsePoll(data.toString()));
+      }
     });
   });
 }
@@ -84,7 +88,11 @@ async function getPoll(pollId) {
 async function getVotes(pollId) {
   return new Promise((resolve, reject) => {
     fs.readFile(__dirname + '/votes/' + pollId + '.txt', (err, data) => {
-      resolve(parseVotes(data.toString()));
+      if (!!err) {
+        resolve(null);
+      } else {
+        resolve(parseVotes(data.toString()));
+      }
     });
   });
 }

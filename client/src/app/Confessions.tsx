@@ -11,17 +11,6 @@ import Confession from './Confession';
 
 
 const ConfessionsWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 90%;
-  height: 40px;
-  padding: 10px;
-  border: 2px solid black;
-  margin-bottom: 4px;
-  margin-left: 5%;
-  margin-right: 5%;
-  justify-content: space-between;
 `;
 
 const Confessions = (props) => {
@@ -46,23 +35,24 @@ const Confessions = (props) => {
     props.history.push(`/polls/${id}`);
   };
 
+  const sendToNewConfession = () => {
+    props.history.push(`/confessions/new`);
+  };
+
   return (
-    <ConfessionsWrapper>
-      <Element className="element" id="confessions" style={{
-        position: 'relative',
-          height: '200px',
-          overflow: 'scroll',
-          marginBottom: '100px'
-      }}>
+    <>
+      <Button
+        onClick={sendToNewConfession}>
+        Post confession
+      </Button>
+      <ConfessionsWrapper>
         {confessions.map((confession) => {
           return (
-            <Element name={confession.id} className="element">
-              <Confession {...confession} />
-            </Element>
+              <Confession {...confession} key={confession.id} />
           );
         })}
-      </Element>
-    </ConfessionsWrapper>
+      </ConfessionsWrapper>
+    </>
   );
 }
 

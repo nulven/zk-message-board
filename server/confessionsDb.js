@@ -19,8 +19,8 @@ function parseConfession(data) {
   const [header, message, proofRaw, publicSignalsRaw] = data.split('\n');
   const proof = JSON.parse(proofRaw);
   const publicSignals = publicSignalsRaw.split(',');
-  const [id, date] = header.split(',');
-  return { id, date, message, proof, publicSignals };
+  const [id, groupId, date] = header.split(',');
+  return { id, groupId, date, message, proof, publicSignals };
 }
 
 function parseGroup(data) {
@@ -42,18 +42,22 @@ function addGroupMember(groupId, keyHash) {
   fs.appendFile(__dirname + '/data/groups/' + groupId + '.txt', keyHash + '\n', err => {});
 }
 
-async function recordConfession(message, proof, publicSignals) {
+async function recordConfession(message, proof, publicSignals, groupId) {
   const confessionId = uuidv4();
   const date = Date.now();
-  const header = `${confessionId},${date}`;
-  const confession = [header, message, proof, publicSignals.toString()].join('\n');
+  const header = `${confessionId},${groupId},${date}`;
+  const confession = [header, message, JSON.stringify(proof), publicSignals.toString()].join('\n');
   fs.appendFile(__dirname + '/data/confessions/' + confessionId + '.txt', confession, err => {});
 }
 
 async function getGroup(groupId) {
   return new Promise((resolve, reject) => {
     fs.readFile(__dirname + '/data/groups/' + groupId + '.txt', (err, data) => {
-      resolve(parseGroup(data.toString()));
+      if (data) {
+        resolve(parseGroup(data.toString()));
+      } else {
+        resolve(null);
+      }
     });
   });
 }
@@ -61,7 +65,11 @@ async function getGroup(groupId) {
 async function getConfession(confessionId) {
   return new Promise((resolve, reject) => {
     fs.readFile(__dirname + '/data/confessions/' + confessionId + '.txt', (err, data) => {
-      resolve(parseConfession(data.toString()));
+      if (data) {
+        resolve(parseConfession(data.toString()));
+      } else {
+        resolve(null);
+      }
     });
   });
 }
@@ -94,7 +102,7 @@ async function getConfessions() {
   const requests = files.map((file, index) => {
     const confessionId = file.split('.')[0];
     return getConfession(confessionId).then(data => {
-      parsed.push(parseConfession(data.toString()));
+      parsed.push(data);
     });
   });
   return Promise.all(requests).then(() => {

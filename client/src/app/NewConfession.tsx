@@ -57,7 +57,7 @@ const NewConfession = (props) => {
   const loadKey = async () => {
     const publicKeyMaybe = localStorage.getItem(`publicKey`);
     const privateKeyMaybe = localStorage.getItem(`privateKey`);
-    const groupMaybe = localStorage.getItem(`groupId`);
+    const groupMaybe = localStorage.getItem(`group`);
     if (publicKeyMaybe !== null && privateKeyMaybe !== null && groupMaybe !== null) {
       if (true) {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
@@ -112,9 +112,7 @@ const NewConfession = (props) => {
     const hash = mimc(...aBits).toString();
   
     const input = { publicKey: aBits, hashes: [hash], sig: [rBits, sBits], message: msgBits };
-    console.log(JSON.stringify(input));
     const proof = await proveSignature(aBits, [hash], [rBits, sBits], msgBits);
-    console.log(proof.publicSignals);
  
     post('/api/confessions/post', { message, proof, group })
     .then(data => {

@@ -21,12 +21,13 @@ function parseConfession(data) {
   const publicSignals = publicSignalsRaw.split(',');
   const [id, groupId, date] = header.split(',');
   return { id, groupId, date, message, proof, publicSignals };
+
 }
 
 function parseGroup(data) {
   var [header, ...users] = data.split('\n').filter(v => v !== '');
-  const [id, name, passwordHash] = header.split(',');
-  return { id, name, passwordHash, users };
+  const [name, passwordHash] = header.split(',');
+  return { name, passwordHash, users };
 }
 
 function createGroup(name) {

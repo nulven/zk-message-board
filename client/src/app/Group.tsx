@@ -46,19 +46,36 @@ const Group = (props) => {
     }
   };
 
+  function buffer2bits(buff) {
+    const res = [];
+    for (let i = 0; i < buff.length; i++) {
+      for (let j = 0; j < 8; j++) {
+        if ((buff[i] >> j) & 1) {
+          res.push('1');
+        } else {
+          res.push('0');
+        }
+      }
+    }
+    return res;
+  }
+
   const register = async () => {
     const passwordHash = mimc(password).toString();
     if (passwordHash === group.passwordHash) {
       const keyProof = await proveHash(password, group.passwordHash);
 
       const { publicKey, privateKey } = generateKey();
-      const pubKeyHash = mimc(publicKey[0]).toString(); // fix
-      const passwordProof = await proveHash(publicKey, pubKeyHash);
+      const pPubKey = packPoint(publicKey);
+      const aBits = buffer2bits(pPubKey);
+      const hash = mimc(...aBits).toString();
+      //const pubKeyHash = mimc(publicKey[0]).toString(); // fix
+      const passwordProof = await proveHash(publicKey, hash);
 
       //post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
       post('/api/groups/register', {
         name,
-        keyHash: pubKeyHash,
+        keyHash: hash,
         passwordHash: group.passwordHash,
         keyProof: keyProof.proof,
         passwordProof: passwordProof.proof

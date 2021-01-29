@@ -7,6 +7,7 @@ contract ContractStorage {
   ///  VARS  ///
   //////////////
   uint256 public constant MAX_USERS = 10;
+  uint256 public constant MAX_GROUPS = 10;
 
   // maps generated message ids to group names
   struct Message {
@@ -28,7 +29,7 @@ contract ContractStorage {
   mapping(string => uint256) public groupIDs;
 
   // maps each of the groupCount groups to the info
-  Group[10] groups;
+  Group[MAX_GROUPS] groups;
   mapping(string => bool) public groupExists;
 
   // We have already assigned groups [0, 1...groupCount)

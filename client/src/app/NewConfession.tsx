@@ -63,16 +63,6 @@ const NewConfession = (props) => {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
         setPrivateKey(privateKeyMaybe);
         setGroup(groupMaybe);
-
-        // Remove once password hash is preset in contract
-        get(`/api/groups/${groupMaybe}`, {})
-        .then(data => {
-          if (data.success) {
-            setPasswordHash(data.group.passwordHash);
-          } else {
-            window.alert('Error');
-          }
-        });
       } else {
         console.log('Key is not valid');
       }
@@ -109,7 +99,8 @@ const NewConfession = (props) => {
     const sBits = buffer2bits(pSignature.slice(32, 64));
     const msgBits = buffer2bits(msg);
 
-    const hash = mimc(...aBits).toString();
+    const hash = mimc(...aBits).toString(); // fix
+    // const hashes =
   
     const input = { publicKey: aBits, hashes: [hash], sig: [rBits, sBits], message: msgBits };
     const proof = await proveSignature(aBits, [hash], [rBits, sBits], msgBits);

@@ -36,7 +36,7 @@ const jsonParser = bodyParser.json();
 router.post("/groups/create", jsonParser, async (req, res) => {
   const { name } = req.body;
   //const { id, password } = await createGroup(name);
-  const { password } = await creategroup(name);
+  const { password } = await createGroup(name);
   res.send({ success: true, password });
 });
 

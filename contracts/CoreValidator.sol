@@ -135,7 +135,7 @@ contract CoreValidator is ContractStorage {
   }
 
   function addUserToGroup(string memory groupName, uint256 userHash)
-    public
+    private
     returns (Group[] memory groups)
   {
     uint256 groupID = groupIDs[groupName];

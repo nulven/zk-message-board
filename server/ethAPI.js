@@ -4,6 +4,7 @@ const fs = require("fs");
 const provider = new providers.JsonRpcProvider("http://localhost:8545");
 const signer = provider.getSigner();
 const contract = connect();
+runTests();
 
 async function connect(contractName) {
   const location = __dirname + "/../contracts/json/CoreValidator.json";
@@ -14,13 +15,51 @@ async function connect(contractName) {
   return new Contract(contractAddress, contractABI, signer);
 }
 
+async function runTests() {
+  await this.coreValidator.createGroup("asdf", 1);
+  console.log(await this.coreValidator.getConfessions());
+  console.log(await this.coreValidator.getGroups());
+  console.error("65");
+  const sig_check_proof_json = JSON.parse(
+    fs.readFileSync("json/sigCheckProof.json")
+  );
+  const sig_check_public_json = JSON.parse(
+    fs.readFileSync("json/sigCheckPublic.json")
+  );
+  const hash_proof_json = JSON.parse(
+    fs.readFileSync("json/sigCheckProof.json")
+  );
+  const hash_public_json = JSON.parse(
+    fs.readFileSync("json/sigCheckPublic.json")
+  );
+  console.error("78");
+  const pollName = "myPoll";
+  const answerValid = await this.coreValidator.verifyAndStoreRegistration(
+    ...callArgsFromProofAndSignals(hash_proof_json, hash_public_json),
+    ...callArgsFromProofAndSignals(sig_check_proof_json, sig_check_public_json),
+    pollName
+  );
+  console.error("88");
+
+  const addedMessage = await this.coreValidator.verifyAndAddMessage(
+    ...callArgsFromProofAndSignals(hash_proof_json, hash_public_json),
+    "message"
+  );
+  const isRegistered = await this.coreValidator.checkIfHashRegisteredForPoll(
+    pollName,
+    hash_public_json[0]
+  );
+  assert(isRegistered == 1); // Pass
+  console.error("99");
+  console.log(answerValid);
+}
+
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 }
-
 function randpassword() {
   return Math.floor(Math.random() * 100000000000);
 }

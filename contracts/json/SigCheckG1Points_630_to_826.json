@@ -1,0 +1,1 @@
+{"abi":[{"inputs":[{"components":[{"internalType":"uint256","name":"X","type":"uint256"},{"internalType":"uint256","name":"Y","type":"uint256"}],"internalType":"struct Pairing.G1Point[]","name":"IC","type":"tuple[]"}],"name":"assignPoints","outputs":[],"stateMutability":"pure","type":"function"}],"address":"0xde2Bd2ffEA002b8E84ADeA96e5976aF664115E2c"}

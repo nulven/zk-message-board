@@ -1,0 +1,29 @@
+{
+  "abi": [
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "name": "hashIsVerified",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pfsVerified",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "string", "name": "", "type": "string" },
+        { "internalType": "uint256", "name": "", "type": "uint256" }
+      ],
+      "name": "registeredHashes",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "address": "0x5302E909d1e93e30F05B5D6Eea766363D14F9892"
+}

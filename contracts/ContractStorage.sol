@@ -8,6 +8,7 @@ contract ContractStorage {
   //////////////
   uint256 public constant MAX_USERS = 10;
   uint256 public constant MAX_GROUPS = 10;
+  uint256 public constant MAX_CONFESSIONS = 10;
 
   // maps generated message ids to group names
   struct Message {
@@ -17,8 +18,8 @@ contract ContractStorage {
     bool verified;
   }
   // Maps contiguous confession ids to messages
-  Message[] confessions;
-  uint256 confessionCount;
+  Message[MAX_CONFESSIONS] public confessions;
+  uint256 public confessionCount;
 
   // maps group names to hash of public keys
   struct Group {
@@ -32,13 +33,13 @@ contract ContractStorage {
   mapping(string => uint256) public groupIDs;
 
   // maps each of the groupCount groups to the info
-  Group[MAX_GROUPS] groups;
+  Group[MAX_GROUPS] public groups;
   mapping(string => bool) public groupExists;
 
   // We have already assigned groups [0, 1...groupCount)
   // We next assign the incoming group to groupCount
   // Note that we dont need id's anymore since its sequential
-  uint256 groupCount;
+  uint256 public groupCount;
 
   uint256 public pfsVerified;
 }

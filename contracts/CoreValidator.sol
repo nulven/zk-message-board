@@ -59,12 +59,7 @@ contract CoreValidator is ContractStorage {
     */
 
     // TODO: Assert message and hash are the same
-    Message memory newMessage;
-    newMessage.id = confessionCount;
-    newMessage.text = message;
-    newMessage.group = groupName;
-    confessions.push(newMessage);
-    confessionCount += 1;
+    createMessage(message, groupName);
     return true;
   }
 
@@ -97,7 +92,10 @@ contract CoreValidator is ContractStorage {
     uint256 hashedPass,
     string memory groupName
   ) public returns (bool) {
-    require(hashedPass == groups[groupIDs[groupName]].passwordHash);
+    require(
+      hashedPass == groups[groupIDs[groupName]].passwordHash,
+      "Wrong pass hash!"
+    );
     /*
     require(
       checkHashProof(
@@ -129,10 +127,12 @@ contract CoreValidator is ContractStorage {
   // SETTERS
   function createGroup(string memory groupName, uint256 passwordHash) public {
     // Make new group
-    require(!groupExists[groupName]);
-    Group memory newGroup;
+    require(!groupExists[groupName], "Group already exists!");
+    require(groupCount < MAX_GROUPS, "Too many groups!");
+    Group storage newGroup;
     newGroup.passwordHash = passwordHash;
     newGroup.name = groupName;
+    newGroup.userCount = 0;
 
     // Assign the group an ID and make it exist
     // Then increment the number of groups
@@ -145,19 +145,49 @@ contract CoreValidator is ContractStorage {
   function addUserToGroup(string memory groupName, uint256 userHash) public {
     uint256 groupID = groupIDs[groupName];
     uint256 userCount = groups[groupID].userCount;
-    require(userCount < MAX_USERS);
+    require(userCount < MAX_USERS, "Too many users!");
 
     groups[groupID].users[userCount] = userHash;
     groups[groupID].userCount++;
   }
 
+  // TODO: make private
+  function createMessage(string memory message, string memory groupName)
+    public
+  {
+    confessions[confessionCount] = Message({
+      id: confessionCount,
+      text: message,
+      group: groupName,
+      verified: false
+    });
+    confessionCount += 1;
+  }
+
   // GETTERS
 
-  function getConfessions() public view returns (Message[] memory) {
+  function getConfessions()
+    public
+    view
+    returns (Message[MAX_CONFESSIONS] memory)
+  {
     return confessions;
   }
 
-  function getGroups() public view returns (Group[10] memory) {
+  function getConfessionX(uint256 confessionID)
+    public
+    view
+    returns (Message memory)
+  {
+    return confessions[confessionID];
+  }
+
+  function getGroups() public view returns (Group[MAX_GROUPS] memory) {
     return groups;
+  }
+
+  function getGroupZero() public view returns (Group memory) {
+    require(groupCount > 0, "Not enough groups!");
+    return groups[0];
   }
 }

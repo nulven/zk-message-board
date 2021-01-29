@@ -148,11 +148,11 @@ contract CoreValidator is ContractStorage {
 
   // GETTERS
 
-  function getConfessions() public pure returns (Message[] memory messages) {
+  function getConfessions() public view returns (Message[] memory messages) {
     return confessions;
   }
 
-  function getGroups() public pure returns (Group[] memory groups) {
+  function getGroups() public view returns (Group[] memory groups) {
     return groups;
   }
 }

@@ -49,13 +49,19 @@ contract CoreValidator is ContractStorage {
   function verifyAndAddMessage(
     Proof memory proof,
     uint256[825] memory input,
-    string memory message
+    string memory message,
+    string memory groupName
   ) public returns (bool success) {
     require(
       checkSigCheckProof(proof.p1, proof.p2, proof.p3, input),
       "Proof invalid!"
     );
-    hashIsVerified[keccak256(abi.encode(message))] = true;
+
+    // TODO: Assert message and hash are the same
+    Message memory newMessage;
+    newMessage.text = message;
+    confessions[confessionCount] = newMessage;
+    confessionCount += 1;
     return true;
   }
 
@@ -78,13 +84,17 @@ contract CoreValidator is ContractStorage {
     return true;
   }
 
+  // Proof we can hash to that key, the hashed key,
+  // proof we can hash to that password, the hashed
+  // password
   function verifyAndStoreRegistration(
     Proof memory keyHashProof,
-    Proof memory passwordHashProof,
     uint256 hashedKey,
+    Proof memory passwordHashProof,
     uint256 hashedPass,
-    string memory pollName
+    string memory groupName
   ) public returns (bool success) {
+    require(hashedKey == groups[groupIDs[groupName]].passwordHash);
     require(
       checkHashProof(
         passwordHashProof.p1,
@@ -103,7 +113,46 @@ contract CoreValidator is ContractStorage {
       ),
       "Key proof invalid!"
     );
-    registeredHashes[pollName].push(hashedKey);
+    addUserToGroup(groupName, hashedKey);
     return true;
+  }
+
+  // GETTERS AND SETTERS
+
+  // SETTERS
+  function createGroup(string memory groupName, uint256 passwordHash) public {
+    // Make new group
+    require(!groupExists[groupName]);
+    Group memory newGroup;
+    newGroup.passwordHash = passwordHash;
+
+    // Assign the group an ID and make it exist
+    // Then increment the number of groups
+    groupIDs[groupName] = groupCount;
+    groupExists[groupName] = true;
+    groups[groupCount] = newGroup;
+    groupCount += 1;
+  }
+
+  function addUserToGroup(string memory groupName, uint256 userHash)
+    public
+    returns (Group[] memory groups)
+  {
+    uint256 groupID = groupIDs[groupName];
+    uint256 userCount = groups[groupID].userCount;
+    require(userCount < MAX_USERS);
+
+    groups[groupID].users[userCount] = userHash;
+    userCount++;
+  }
+
+  // GETTERS
+
+  function getConfessions() public view returns (Message[] memory messages) {
+    return confessions;
+  }
+
+  function getGroups() public view returns (Group[] memory groups) {
+    return groups;
   }
 }

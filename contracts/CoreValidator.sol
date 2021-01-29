@@ -143,7 +143,7 @@ contract CoreValidator is ContractStorage {
     require(userCount < MAX_USERS);
 
     groups[groupID].users[userCount] = userHash;
-    userCount++;
+    groups[groupID].userCount++;
   }
 
   // GETTERS

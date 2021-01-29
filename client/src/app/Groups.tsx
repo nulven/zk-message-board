@@ -27,7 +27,6 @@ const Wrapper = styled.div`
 `;
 
 type GroupProps = {
-  id: string;
   name: string;
   passwordHash: string;
   users: Array<string>;

@@ -82,16 +82,18 @@ for (circuitName of circuitsList.split(",")) {
       "npx snarkjs groth16 prove circuit.zkey witness.wtns proof.json public.json",
       { stdio: "inherit" }
     );
-    /*
     execSync(
       'npx snarkjs groth16 verify verification_key.json public.json proof.json',
       { stdio: 'inherit' }
     );
-    */
-    execSync("mkdir -p ../circuits-compiled/" + circuitName, {
-      stdio: "inherit",
-    });
-    execSync("mkdir -p ../keys/" + circuitName, { stdio: "inherit" });
+    execSync(
+      'mkdir -p ../circuits-compiled/' + circuitName,
+      { stdio: 'inherit' }
+    );
+    execSync(
+      'mkdir -p ../keys/' + circuitName,
+      { stdio: 'inherit' }
+    );
     fs.copyFileSync(
       "circuit.wasm",
       cwd + "/circuits/" + wasmOutPath + "/" + circuitName + "/circuit.wasm"

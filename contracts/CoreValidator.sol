@@ -35,7 +35,7 @@ contract CoreValidator is ContractStorage {
     uint256[2][2] memory _b,
     uint256[2] memory _c,
     uint256[825] memory _input
-  ) public returns (bool success) {
+  ) public returns (bool) {
     // SigCheckVerifier verifier = new SigCheckVerifier();
     require(
       SigCheckVerifier.verifyProof(_a, _b, _c, _input),
@@ -47,20 +47,23 @@ contract CoreValidator is ContractStorage {
   }
 
   function verifyAndAddMessage(
-    Proof memory proof,
     uint256[825] memory input,
     string memory message,
     string memory groupName
-  ) public returns (bool success) {
+  ) public returns (bool) {
+    /*
     require(
       checkSigCheckProof(proof.p1, proof.p2, proof.p3, input),
       "Proof invalid!"
     );
+    */
 
     // TODO: Assert message and hash are the same
     Message memory newMessage;
+    newMessage.id = confessionCount;
     newMessage.text = message;
-    confessions[confessionCount] = newMessage;
+    newMessage.group = groupName;
+    confessions.push(newMessage);
     confessionCount += 1;
     return true;
   }
@@ -73,7 +76,7 @@ contract CoreValidator is ContractStorage {
     uint256[2][2] memory _b,
     uint256[2] memory _c,
     uint256[2] memory _input
-  ) public returns (bool success) {
+  ) public returns (bool) {
     // HashVerifier verifier = new HashVerifier();
     require(
       HashVerifier.verifyProof(_a, _b, _c, _input),
@@ -93,8 +96,9 @@ contract CoreValidator is ContractStorage {
     Proof memory passwordHashProof,
     uint256 hashedPass,
     string memory groupName
-  ) public returns (bool success) {
-    require(hashedKey == groups[groupIDs[groupName]].passwordHash);
+  ) public returns (bool) {
+    require(hashedPass == groups[groupIDs[groupName]].passwordHash);
+    /*
     require(
       checkHashProof(
         passwordHashProof.p1,
@@ -104,6 +108,8 @@ contract CoreValidator is ContractStorage {
       ),
       "Password proof invalid!"
     );
+    */
+    /*
     require(
       checkHashProof(
         keyHashProof.p1,
@@ -113,6 +119,7 @@ contract CoreValidator is ContractStorage {
       ),
       "Key proof invalid!"
     );
+    */
     addUserToGroup(groupName, hashedKey);
     return true;
   }
@@ -125,6 +132,7 @@ contract CoreValidator is ContractStorage {
     require(!groupExists[groupName]);
     Group memory newGroup;
     newGroup.passwordHash = passwordHash;
+    newGroup.name = groupName;
 
     // Assign the group an ID and make it exist
     // Then increment the number of groups
@@ -134,10 +142,7 @@ contract CoreValidator is ContractStorage {
     groupCount += 1;
   }
 
-  function addUserToGroup(string memory groupName, uint256 userHash)
-    public
-    returns (Group[] memory groups)
-  {
+  function addUserToGroup(string memory groupName, uint256 userHash) public {
     uint256 groupID = groupIDs[groupName];
     uint256 userCount = groups[groupID].userCount;
     require(userCount < MAX_USERS);
@@ -148,11 +153,11 @@ contract CoreValidator is ContractStorage {
 
   // GETTERS
 
-  function getConfessions() public view returns (Message[] memory messages) {
+  function getConfessions() public view returns (Message[] memory) {
     return confessions;
   }
 
-  function getGroups() public view returns (Group[] memory groups) {
+  function getGroups() public view returns (Group[10] memory) {
     return groups;
   }
 }

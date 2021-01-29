@@ -25,7 +25,7 @@ async function deploy(fileName, libraries = []) {
   const input = {
     language: "Solidity",
     sources: {
-      fileName: {
+      [fileName]: {
         content: file,
       },
     },
@@ -50,6 +50,7 @@ async function deploy(fileName, libraries = []) {
     solc.compile(JSON.stringify(input), { import: findImports })
   );
 
+  console.log(output);
   const files = Object.entries(output.contracts);
   const contracts = [];
   const deployedContracts = [];
@@ -103,6 +104,6 @@ async function deploy(fileName, libraries = []) {
       })
     );
 
-    return { bytecode, abi, address: contractObject.address };
+    return { name, bytecode, abi, address: contractObject.address };
   }
 }

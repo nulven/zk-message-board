@@ -61,7 +61,7 @@ const Group = (props) => {
   }
 
   const register = async () => {
-    const passwordHash = mimc(password).toString();
+    const passwordHash = BigInt(mimc(password)).toString();
     if (passwordHash === group.passwordHash) {
       const keyProof = await proveHash(password, group.passwordHash);
 
@@ -70,7 +70,8 @@ const Group = (props) => {
       const aBits = buffer2bits(pPubKey);
       const hash = mimc(...aBits).toString();
       //const pubKeyHash = mimc(publicKey[0]).toString(); // fix
-      const passwordProof = await proveHash(publicKey, hash);
+      const a = BigInt(parseInt(aBits.join(''), 2));
+      const passwordProof = await proveHash(a, hash);
 
       //post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
       post('/api/groups/register', {
@@ -105,7 +106,7 @@ const Group = (props) => {
           <p>You are a part of this group</p>
         :
           <>
-            <p>{name}</p>
+            <p>'hello'</p>
             <p>Password hash is: {group.passwordHash}</p>
             <TextInput
               placeholder={null}

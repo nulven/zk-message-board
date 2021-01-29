@@ -10,15 +10,18 @@ contract ContractStorage {
 
   // maps generated message ids to group names
   struct Message {
+    uint256 id;
     string text;
+    string group;
     bool verified;
   }
   // Maps contiguous confession ids to messages
-  Message[] public confessions;
+  Message[] confessions;
   uint256 confessionCount;
 
   // maps group names to hash of public keys
   struct Group {
+    string name;
     uint256 passwordHash;
     uint256[MAX_USERS] users;
     uint256 userCount;

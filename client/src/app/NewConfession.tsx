@@ -63,16 +63,6 @@ const NewConfession = (props) => {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
         setPrivateKey(privateKeyMaybe);
         setGroup(groupMaybe);
-
-        // Remove once password hash is preset in contract
-        get(`/api/groups/${groupMaybe}`, {})
-        .then(data => {
-          if (data.success) {
-            setPasswordHash(data.group.passwordHash);
-          } else {
-            window.alert('Error');
-          }
-        });
       } else {
         console.log('Key is not valid');
       }

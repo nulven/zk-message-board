@@ -21,7 +21,7 @@ const App = () => {
         <Page path="/confessions/new" Subpage={NewConfession} />
         <Page path="/confessions" Subpage={Confessions} />
         <Page path="/groups/new" Subpage={NewGroup} />
-        <Page path="/groups/:id" Subpage={Group} />
+        <Page path="/groups/:name" Subpage={Group} />
         <Page path="/groups" Subpage={Groups} />
         <Page path="/polls/new" Subpage={NewPoll} />
         <Page path="/polls/:id" Subpage={Poll} />

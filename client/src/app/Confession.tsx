@@ -44,16 +44,14 @@ type ConfessionProps = {
   id: string,
   message: string,
   data: string,
-  groupId: string,
-  proof: Object,
-  publicSignals: Array<string>
+  group: string,
 };
 
 const Confession = (props: ConfessionProps) => {
   return (
     <>
       <ConfessionWrapper>
-        <Group>Post by someone in {props.groupId}</Group>
+        <Group>Post by someone in {props.group}</Group>
         <Message>{props.message}</Message>
       </ConfessionWrapper>
       <Spacer />

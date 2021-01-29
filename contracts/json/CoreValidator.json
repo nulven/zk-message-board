@@ -1,0 +1,165 @@
+{
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "pfsAccepted",
+          "type": "uint256"
+        }
+      ],
+      "name": "ProofVerified",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256[2]", "name": "_a", "type": "uint256[2]" },
+        {
+          "internalType": "uint256[2][2]",
+          "name": "_b",
+          "type": "uint256[2][2]"
+        },
+        { "internalType": "uint256[2]", "name": "_c", "type": "uint256[2]" },
+        { "internalType": "uint256[2]", "name": "_input", "type": "uint256[2]" }
+      ],
+      "name": "checkHashProof",
+      "outputs": [
+        { "internalType": "bool", "name": "success", "type": "bool" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256[2]", "name": "_a", "type": "uint256[2]" },
+        {
+          "internalType": "uint256[2][2]",
+          "name": "_b",
+          "type": "uint256[2][2]"
+        },
+        { "internalType": "uint256[2]", "name": "_c", "type": "uint256[2]" },
+        {
+          "internalType": "uint256[825]",
+          "name": "_input",
+          "type": "uint256[825]"
+        }
+      ],
+      "name": "checkSigCheckProof",
+      "outputs": [
+        { "internalType": "bool", "name": "success", "type": "bool" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "name": "hashIsVerified",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pfsVerified",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "string", "name": "", "type": "string" },
+        { "internalType": "uint256", "name": "", "type": "uint256" }
+      ],
+      "name": "registeredHashes",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256[2]",
+              "name": "p1",
+              "type": "uint256[2]"
+            },
+            {
+              "internalType": "uint256[2][2]",
+              "name": "p2",
+              "type": "uint256[2][2]"
+            },
+            { "internalType": "uint256[2]", "name": "p3", "type": "uint256[2]" }
+          ],
+          "internalType": "struct CoreValidator.Proof",
+          "name": "proof",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256[825]",
+          "name": "input",
+          "type": "uint256[825]"
+        },
+        { "internalType": "string", "name": "message", "type": "string" }
+      ],
+      "name": "verifyAndAddMessage",
+      "outputs": [
+        { "internalType": "bool", "name": "success", "type": "bool" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256[2]",
+              "name": "p1",
+              "type": "uint256[2]"
+            },
+            {
+              "internalType": "uint256[2][2]",
+              "name": "p2",
+              "type": "uint256[2][2]"
+            },
+            { "internalType": "uint256[2]", "name": "p3", "type": "uint256[2]" }
+          ],
+          "internalType": "struct CoreValidator.Proof",
+          "name": "keyHashProof",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint256[2]",
+              "name": "p1",
+              "type": "uint256[2]"
+            },
+            {
+              "internalType": "uint256[2][2]",
+              "name": "p2",
+              "type": "uint256[2][2]"
+            },
+            { "internalType": "uint256[2]", "name": "p3", "type": "uint256[2]" }
+          ],
+          "internalType": "struct CoreValidator.Proof",
+          "name": "passwordHashProof",
+          "type": "tuple"
+        },
+        { "internalType": "uint256", "name": "hashedKey", "type": "uint256" },
+        { "internalType": "uint256", "name": "hashedPass", "type": "uint256" },
+        { "internalType": "string", "name": "pollName", "type": "string" }
+      ],
+      "name": "verifyAndStoreRegistration",
+      "outputs": [
+        { "internalType": "bool", "name": "success", "type": "bool" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "address": "0x870526b7973b56163a6997bB7C886F5E4EA53638"
+}

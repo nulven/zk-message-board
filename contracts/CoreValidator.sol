@@ -33,10 +33,7 @@ contract CoreValidator is ContractStorage {
     string memory message,
     string memory groupName
   ) public returns (bool) {
-    require(
-      SigCheckVerifier.verifyProof(a, b, c, input),
-      "Proof invalid!"
-    );
+    require(SigCheckVerifier.verifyProof(a, b, c, input), "Proof invalid!");
     pfsVerified += 1;
     emit ProofVerified(pfsVerified);
 
@@ -69,21 +66,11 @@ contract CoreValidator is ContractStorage {
     );
     */
     require(
-      HashVerifier.verifyProof(
-        keyA,
-        keyB,
-        keyC,
-        keyInput
-      ),
+      HashVerifier.verifyProof(keyA, keyB, keyC, keyInput),
       "Key proof invalid!"
     );
     require(
-      HashVerifier.verifyProof(
-        passwordA,
-        passwordB,
-        passwordC,
-        passwordInput 
-      ),
+      HashVerifier.verifyProof(passwordA, passwordB, passwordC, passwordInput),
       "Password proof invalid!"
     );
     addUserToGroup(groupName, keyInput[0]);
@@ -137,6 +124,20 @@ contract CoreValidator is ContractStorage {
   }
 
   // GETTERS
+  function getAllHashedUsersByGroupID(uint256 groupID)
+    public
+    returns (uint256[MAX_USERS] memory)
+  {
+    require(groupCount > groupID, "Not enough groups!");
+    return groups[groupID].users;
+  }
+
+  function getAllHashedUsersByGroupName(string memory groupName)
+    public
+    returns (uint256[MAX_USERS] memory)
+  {
+    return getAllHashedUsersByGroupID(groupIDs[groupName]);
+  }
 
   function getConfessions()
     public
@@ -146,11 +147,12 @@ contract CoreValidator is ContractStorage {
     return confessions;
   }
 
-  function getConfessionX(uint256 confessionID)
+  function getConfessionByID(uint256 confessionID)
     public
     view
     returns (Message memory)
   {
+    require(confessionCount > confessionID, "Not enough confessions!");
     return confessions[confessionID];
   }
 
@@ -158,8 +160,8 @@ contract CoreValidator is ContractStorage {
     return groups;
   }
 
-  function getGroupZero() public view returns (Group memory) {
-    require(groupCount > 0, "Not enough groups!");
-    return groups[0];
+  function getGroupByID(uint256 groupID) public view returns (Group memory) {
+    require(groupCount > groupID, "Not enough groups!");
+    return groups[groupID];
   }
 }

@@ -6,6 +6,8 @@ contract ContractStorage {
   //////////////
   ///  VARS  ///
   //////////////
+
+  // Should match the number of users in the sig-check contract
   uint256 public constant MAX_USERS = 10;
   uint256 public constant MAX_GROUPS = 10;
   uint256 public constant MAX_CONFESSIONS = 10;

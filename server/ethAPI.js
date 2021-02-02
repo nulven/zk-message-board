@@ -3,11 +3,11 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const provider = new providers.JsonRpcProvider("http://localhost:8545");
 const signer = provider.getSigner();
-const { mimcHash } = require("./mimc.js");
+const { mimcHash, modPBigIntNative } = require("./mimc.js");
 //const contract = await connect('CoreValidator');
 
 async function connect(contractName) {
-  const location = __dirname + "/../contracts/json/CoreValidator.json";
+  const location = __dirname + "/../contracts/json/" + contractName + ".json";
   const contractJSON = JSON.parse(fs.readFileSync(location)); // .json
   const contractABI = contractJSON.abi;
   const contractAddress = contractJSON.address;
@@ -27,11 +27,8 @@ function randpassword() {
 }
 
 const processProof = (snarkProof, publicSignals) => {
-  // the object returned by genZKSnarkProof needs to be massaged into a set of parameters the verifying contract
-  // will accept
   return [
     snarkProof.pi_a.slice(0, 2), // pi_a
-    // genZKSnarkProof reverses values in the inner arrays of pi_b
     [
       snarkProof.pi_b[0].slice(0).reverse(),
       snarkProof.pi_b[1].slice(0).reverse(),
@@ -57,36 +54,47 @@ async function createGroup(name) {
 
 async function addGroupMember(
   name,
-  keyHash,
-  passwordHash,
   keyProof,
-  passwordProof
+  keyPublicSignals,
+  passwordProof,
+  passwordPublicSignals
 ) {
-  // returns bool
   const contract = await connect("CoreValidator");
-  const keyOutput = processProof(keyProof, [keyHash]);
-  const passwordOutput = processProof(passwordProof, [passwordHash]);
-  const registration = await contract.verifyAndStoreRegistration(
-    keyOutput,
-    BigInt(keyHash),
-    passwordOutput,
-    BigInt(passwordHash),
-    name
+  const keyOutput = processProof(
+    keyProof,
+    keyPublicSignals.map((x) => modPBigIntNative(x))
   );
-  return !!registration; // check
+  const passwordOutput = processProof(
+    passwordProof,
+    passwordPublicSignals.map((x) => modPBigIntNative(x))
+  );
+  const registration = await contract.verifyAndStoreRegistration(
+    ...keyOutput,
+    ...passwordOutput,
+    name
+  )
+  .catch(err => {
+    console.log(err);
+  });
+  return !!registration;
 }
 
 async function recordConfession(message, proof, publicSignals, name) {
   // returns null
   const contract = await connect("CoreValidator");
-  const output = processProof(proof, publicSignals);
+  const output = processProof(
+    proof,
+    publicSignals.map((x) => modPBigIntNative(x))
+  );
   const confession = await contract.verifyAndAddMessage(
-    publicSignals.map((x) => BigInt(x)),
+    ...output,
     message,
     name
-  ); // make sure solidity includes name
-  console.log("CNFESSION", confession);
-  return !!confession; // check
+  )
+  .catch(err => {
+    console.log(err);
+  }); // make sure solidity includes name
+  return !!confession;
 }
 
 // needs done
@@ -100,7 +108,8 @@ async function getGroups() {
       users: group.users,
     };
   });
-  return parsedGroups;
+  const filteredGroups = parsedGroups.filter((group) => group.passwordHash !== '0');
+  return filteredGroups;
 }
 
 // needs done
@@ -114,7 +123,8 @@ async function getConfessions() {
       group: confession.group,
     };
   });
-  return parsedConfessions;
+  const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
+  return filteredConfessions;
 }
 
 module.exports = {

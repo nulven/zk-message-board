@@ -41,10 +41,14 @@ router.post("/groups/create", jsonParser, async (req, res) => {
 });
 
 router.post("/groups/register", jsonParser, async (req, res) => {
-  //const { id, keyHash, proof } = req.body;
-  const { name, keyHash, passwordHash, keyProof, passwordProof } = req.body;
-  // await addGroupMember(id, keyHash);
-  const registration = await addGroupMember(name, keyHash, passwordHash, keyProof, passwordProof);
+  const { name, keyProof, passwordProof } = req.body;
+  const registration = await addGroupMember(
+    name,
+    keyProof.proof,
+    keyProof.publicSignals,
+    passwordProof.proof,
+    passwordProof.publicSignals
+  );
   res.send({ success: registration });
 });
 

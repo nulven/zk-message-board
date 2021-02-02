@@ -5,11 +5,12 @@
   "main": "./client/index.tsx",
   "scripts": {
     "build": "$(npm bin)/webpack --mode development ",
-    "server": "node ./server/app.js",
+    "server": "nodemon ./server/app.js",
     "babel": "babel --presets es2015 client/index.js -o ./lib/index.js",
     "client": "$(npm bin)/webpack --mode development --watch",
     "dev": "$(npm bin)/concurrently \"npm run client\" \"npm run server\"",
-    "compile": "node ./circuits/builder.js circuits-compiled keys true"
+    "compile": "node ./circuits/builder.js circuits-compiled keys true",
+    "compile-solidity": "node ./circuits/solbuilder.js "
   },
   "repository": {
     "type": "git",
@@ -53,6 +54,7 @@
     "next": "^9.4.4",
     "node-fetch": "^2.6.0",
     "node-sass": "^4.14.1",
+    "nodemon": "^2.0.7",
     "path": "^0.12.7",
     "rc-align": "^2.3.5",
     "rc-slider": "^9.3.1",

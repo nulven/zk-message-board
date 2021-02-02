@@ -16,11 +16,6 @@ contract CoreValidator is ContractStorage {
   //     Pairing.G2Point B;
   //     Pairing.G1Point C;
   //   }
-  struct Proof {
-    uint256[2] p1;
-    uint256[2][2] p2;
-    uint256[2] p3;
-  }
   //////////////
   /// EVENTS ///
   //////////////
@@ -30,33 +25,20 @@ contract CoreValidator is ContractStorage {
   ////////////////
   /// Messages  //
   ////////////////
-  function checkSigCheckProof(
-    uint256[2] memory _a,
-    uint256[2][2] memory _b,
-    uint256[2] memory _c,
-    uint256[825] memory _input
-  ) public returns (bool) {
-    // SigCheckVerifier verifier = new SigCheckVerifier();
-    require(
-      SigCheckVerifier.verifyProof(_a, _b, _c, _input),
-      "Failed init proof check"
-    );
-    pfsVerified += 1;
-    emit ProofVerified(pfsVerified);
-    return true;
-  }
-
   function verifyAndAddMessage(
+    uint256[2] memory a,
+    uint256[2][2] memory b,
+    uint256[2] memory c,
     uint256[825] memory input,
     string memory message,
     string memory groupName
   ) public returns (bool) {
-    /*
     require(
-      checkSigCheckProof(proof.p1, proof.p2, proof.p3, input),
+      SigCheckVerifier.verifyProof(a, b, c, input),
       "Proof invalid!"
     );
-    */
+    pfsVerified += 1;
+    emit ProofVerified(pfsVerified);
 
     // TODO: Assert message and hash are the same
     createMessage(message, groupName);
@@ -66,60 +48,47 @@ contract CoreValidator is ContractStorage {
   ///////////////////
   /// Registration //
   ///////////////////
-  function checkHashProof(
-    uint256[2] memory _a,
-    uint256[2][2] memory _b,
-    uint256[2] memory _c,
-    uint256[2] memory _input
-  ) public returns (bool) {
-    // HashVerifier verifier = new HashVerifier();
-    require(
-      HashVerifier.verifyProof(_a, _b, _c, _input),
-      "Failed init proof check"
-    );
-    pfsVerified += 1;
-    emit ProofVerified(pfsVerified);
-    return true;
-  }
-
   // Proof we can hash to that key, the hashed key,
   // proof we can hash to that password, the hashed
   // password
   function verifyAndStoreRegistration(
-    Proof memory keyHashProof,
-    uint256 hashedKey,
-    Proof memory passwordHashProof,
-    uint256 hashedPass,
+    uint256[2] memory keyA,
+    uint256[2][2] memory keyB,
+    uint256[2] memory keyC,
+    uint256[2] memory keyInput,
+    uint256[2] memory passwordA,
+    uint256[2][2] memory passwordB,
+    uint256[2] memory passwordC,
+    uint256[2] memory passwordInput,
     string memory groupName
   ) public returns (bool) {
+    /*
     require(
-      hashedPass == groups[groupIDs[groupName]].passwordHash,
+      passwordInput[0] == groups[groupIDs[groupName]].passwordHash,
       "Wrong pass hash!"
     );
-    /*
-    require(
-      checkHashProof(
-        passwordHashProof.p1,
-        passwordHashProof.p2,
-        passwordHashProof.p3,
-        [hashedPass, hashedPass]
-      ),
-      "Password proof invalid!"
-    );
     */
-    /*
     require(
-      checkHashProof(
-        keyHashProof.p1,
-        keyHashProof.p2,
-        keyHashProof.p3,
-        [hashedKey, hashedKey]
+      HashVerifier.verifyProof(
+        keyA,
+        keyB,
+        keyC,
+        keyInput
       ),
       "Key proof invalid!"
     );
-    */
-    addUserToGroup(groupName, hashedKey);
-    return true;
+    require(
+      HashVerifier.verifyProof(
+        passwordA,
+        passwordB,
+        passwordC,
+        passwordInput 
+      ),
+      "Password proof invalid!"
+    );
+    addUserToGroup(groupName, keyInput[0]);
+    pfsVerified += 1;
+    emit ProofVerified(pfsVerified);
   }
 
   // GETTERS AND SETTERS

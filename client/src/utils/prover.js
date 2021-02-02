@@ -36,9 +36,13 @@ export async function proveSignature(publicKey, hashes, sig, message) {
   return prove('sig-check', { publicKey, hashes, sig, message });
 }
 
+export async function verifyHash(proof) {
+  return verify('hash', proof.proof, proof.publicSignals);
+}
+
 
 // FULL VERIFIERS
-export async function verifyHash(key, hash) {
+export async function fullVerifyHash(key, hash) {
   const { proof, publicSignals } = await prove('hash', { x: key, hash: hash });
 
   return verify('hash', proof, publicSignals);

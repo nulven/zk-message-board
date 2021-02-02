@@ -13,7 +13,7 @@ import bigInt from 'big-integer';
 import mimc from '../utils/mimc';
 import { generateKey } from '../utils/utils';
 import { get, post } from '../utils/api';
-import { proveHash } from '../utils/prover';
+import { proveHash, verifyHash } from '../utils/prover';
 
 
 const Wrapper = styled.div`
@@ -33,9 +33,9 @@ const Group = (props) => {
     loadKey();
   }, []);
 
-  const loadKey = async () => {
-    const publicKeyMaybe = localStorage.getItem(`${name}_pubkey`);
-    const privateKeyMaybe = localStorage.getItem(`${name}_prvkey`);
+  const loadKey = () => {
+    const publicKeyMaybe = localStorage.getItem(`${name}_publicKey`);
+    const privateKeyMaybe = localStorage.getItem(`${name}_privateKey`);
     if (publicKeyMaybe !== null && privateKeyMaybe !== null) {
       if (true) {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
@@ -61,30 +61,31 @@ const Group = (props) => {
   }
 
   const register = async () => {
-    const passwordHash = BigInt(mimc(password)).toString();
-    if (passwordHash === group.passwordHash) {
-      const keyProof = await proveHash(password, group.passwordHash);
+    //const passwordHash = BigInt(mimc(password)).toString();
+    const passwordHash = mimc(password).toString();
+    //if (passwordHash === group.passwordHash) {
+    if (true) {
+      const passwordProof = await proveHash(password, passwordHash);
 
       const { publicKey, privateKey } = generateKey();
       const pPubKey = packPoint(publicKey);
       const aBits = buffer2bits(pPubKey);
-      const hash = mimc(...aBits).toString();
       //const pubKeyHash = mimc(publicKey[0]).toString(); // fix
       const a = BigInt(parseInt(aBits.join(''), 2));
-      const passwordProof = await proveHash(a, hash);
+      const hash = mimc(a).toString();
+      const keyProof = await proveHash(a, hash);
 
-      //post('/api/groups/register', { id, proof, keyHash: pubKeyHash })
       post('/api/groups/register', {
         name,
         keyHash: hash,
         passwordHash: group.passwordHash,
-        keyProof: keyProof.proof,
-        passwordProof: passwordProof.proof
+        keyProof: keyProof,
+        passwordProof: passwordProof
       })
       .then(data => {
         if (data.success) {
-          localStorage.setItem(`publicKey`, publicKey);
-          localStorage.setItem(`privateKey`, privateKey.toString());
+          localStorage.setItem(`${name}_publicKey`, publicKey);
+          localStorage.setItem(`${name}_privateKey`, privateKey.toString());
           localStorage.setItem(`group`, name); // check
           setPublicKey(publicKey);
           setPrivateKey(privateKey.toString());
@@ -106,7 +107,6 @@ const Group = (props) => {
           <p>You are a part of this group</p>
         :
           <>
-            <p>'hello'</p>
             <p>Password hash is: {group.passwordHash}</p>
             <TextInput
               placeholder={null}

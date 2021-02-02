@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import mimc from '../utils/mimc';
-import { verifyHash } from '../utils/prover';
+import { fullVerifyHash } from '../utils/prover';
 
 import TextInput from '../components/TextInput';
 import { Button } from '../components/Button';
@@ -43,7 +43,7 @@ const Page = (props) => {
   };
 
   const handleEnterProve = async () => {
-    const res = await verifyHash(preImage2, hashIn);
+    const res = await fullVerifyHash(preImage2, hashIn);
     setResult(res.toString());
   };
 

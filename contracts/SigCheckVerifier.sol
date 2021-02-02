@@ -76,6 +76,9 @@ library SigCheckVerifier {
     SigCheckG1Points_630_to_826.assignPoints(vk.IC);
   }
 
+  event Log(string message);
+  event LogBytes(bytes data);
+
   function verify(uint256[] memory input, Proof memory proof)
     internal
     view
@@ -87,11 +90,13 @@ library SigCheckVerifier {
     require(input.length + 1 == vk.IC.length, "verifier-bad-input");
     // Compute the linear combination vk_x
     Pairing.G1Point memory vk_x = Pairing.G1Point(0, 0);
-    for (uint256 i = 0; i < input.length; i++) {
+    for (uint256 i = 0; i < 400; i++) {
       require(input[i] < snark_scalar_field, "verifier-gte-snark-scalar-field");
       vk_x = Pairing.addition(vk_x, Pairing.scalar_mul(vk.IC[i + 1], input[i]));
     }
     vk_x = Pairing.addition(vk_x, vk.IC[0]);
+    return 0;
+    /*
     if (
       !Pairing.pairingProd4(
         Pairing.negate(proof.A),
@@ -105,6 +110,7 @@ library SigCheckVerifier {
       )
     ) return 1;
     return 0;
+    */
   }
 
   /// @return r  bool true if proof is valid
@@ -113,7 +119,7 @@ library SigCheckVerifier {
     uint256[2][2] memory b,
     uint256[2] memory c,
     uint256[825] memory input
-  ) public view returns (bool r) {
+  ) public view returns (bool) {
     Proof memory proof;
     proof.A = Pairing.G1Point(a[0], a[1]);
     proof.B = Pairing.G2Point([b[0][0], b[0][1]], [b[1][0], b[1][1]]);

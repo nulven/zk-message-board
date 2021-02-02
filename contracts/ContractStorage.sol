@@ -19,7 +19,7 @@ contract ContractStorage {
   }
   // Maps contiguous confession ids to messages
   Message[MAX_CONFESSIONS] public confessions;
-  uint256 public confessionCount;
+  uint256 public confessionCount = 1;
 
   // maps group names to hash of public keys
   struct Group {
@@ -39,7 +39,7 @@ contract ContractStorage {
   // We have already assigned groups [0, 1...groupCount)
   // We next assign the incoming group to groupCount
   // Note that we dont need id's anymore since its sequential
-  uint256 public groupCount;
+  uint256 public groupCount = 1;
 
   uint256 public pfsVerified;
 }

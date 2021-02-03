@@ -9,10 +9,6 @@ const signer = provider.getSigner();
 
 // first string is .sol, rest do not have that ending
 deploy("CoreValidator.sol", [
-  "SigCheckG1Points_0_to_209",
-  "SigCheckG1Points_210_to_419",
-  "SigCheckG1Points_420_to_629",
-  "SigCheckG1Points_630_to_826",
   "SigCheckVerifier",
   "HashVerifier",
   "Pairing",

@@ -56,8 +56,9 @@ async function runTests() {
 }
 
 function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -144,20 +145,28 @@ async function getGroupHashes(name) {
 }
 
 async function getGroups() {
-  const contract = await connect('CoreValidator');
+  const contract = await connect("CoreValidator");
   const groups = await contract.getGroups();
-  const parsedGroups = groups.map(group => {
-    return { name: group.name, passwordHash: group.passwordHash.toString(), users: group.users };
+  const parsedGroups = groups.map((group) => {
+    return {
+      name: group.name,
+      passwordHash: group.passwordHash.toString(),
+      users: group.users,
+    };
   });
   const filteredGroups = parsedGroups.filter((group) => group.passwordHash !== '0');
   return filteredGroups;
 }
 
 async function getConfessions() {
-  const contract = await connect('CoreValidator');
+  const contract = await connect("CoreValidator");
   const confessions = await contract.getConfessions(); // update
-  const parsedConfessions = confessions.map(confession => {
-    return { id: confession.id.toString(), message: confession.text, group: confession.group };
+  const parsedConfessions = confessions.map((confession) => {
+    return {
+      id: confession.id.toString(),
+      message: confession.text,
+      group: confession.group,
+    };
   });
   const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
   const sortedConfessions = filteredConfessions.sort((a, b) => b.id - a.id);

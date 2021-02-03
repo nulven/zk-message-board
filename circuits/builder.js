@@ -93,7 +93,6 @@ for (circuitName of circuitsList.split(",")) {
     execSync(
       'mkdir -p ../keys/' + circuitName,
       { stdio: 'inherit' }
-    );
     fs.copyFileSync(
       "circuit.wasm",
       cwd + "/circuits/" + wasmOutPath + "/" + circuitName + "/circuit.wasm"

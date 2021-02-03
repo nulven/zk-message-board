@@ -101,10 +101,7 @@ contract CoreValidator is ContractStorage {
     groupCount += 1;
   }
 
-  function addUserToGroup(string memory groupName, uint256 userHash)
-    private
-    returns (Group[] memory groups)
-  {
+  function addUserToGroup(string memory groupName, uint256 userHash) public {
     uint256 groupID = groupIDs[groupName];
     uint256 userCount = groups[groupID].userCount;
     require(userCount < MAX_USERS, "Too many users!");

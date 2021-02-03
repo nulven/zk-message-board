@@ -28,7 +28,11 @@ async function verify(circuit, proof, publicSignals) {
 
 // PROVERS
 export async function proveHash(preImage, hash) {
-  return prove('hash', { x: preImage, hash });
+  return prove('hash-check', { x: preImage, hash });
+}
+
+export async function proveHashBits(preImage, hash) {
+  return prove('hash-check-bits', { x: preImage, hash });
 }
 
 export async function proveSignature(publicKey, hashes, sigR8, sigS, message) {
@@ -37,15 +41,25 @@ export async function proveSignature(publicKey, hashes, sigR8, sigS, message) {
 }
 
 export async function verifyHash(proof) {
-  return verify('hash', proof.proof, proof.publicSignals);
+  return verify('hash-check', proof.proof, proof.publicSignals);
+}
+
+export async function verifyHashBits(proof) {
+  return verify('hash-check-bits', proof.proof, proof.publicSignals);
 }
 
 
 // FULL VERIFIERS
 export async function fullVerifyHash(key, hash) {
-  const { proof, publicSignals } = await prove('hash', { x: key, hash: hash });
+  const { proof, publicSignals } = await prove('hash-check', { x: key, hash: hash });
 
-  return verify('hash', proof, publicSignals);
+  return verify('hash-check', proof, publicSignals);
+}
+
+export async function fullVerifyHashBits(key, hash) {
+  const { proof, publicSignals } = await prove('hash-check-bits', { x: key, hash: hash });
+
+  return verify('hash-check', proof, publicSignals);
 }
 
 export async function verifySignature(proof) {

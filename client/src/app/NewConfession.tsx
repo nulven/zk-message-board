@@ -11,9 +11,10 @@ import { generateKey } from '../utils/utils';
 import { proveSignature, verifyHash, verifySignature } from '../utils/prover';
 import { get, post } from '../utils/api';
 import { babyJub, eddsa } from 'circomlib';
+import { utils } from 'ffjavascript';
 import mimc from '../utils/mimc';
-const { packPoint } = babyJub;
-const { verify, packSignature, sign } = eddsa;
+const { unpackPoint, packPoint } = babyJub;
+const { verify, packSignature, sign, prv2pub } = eddsa;
 
 
 const Wrapper = styled.div`
@@ -86,24 +87,33 @@ const NewConfession = (props) => {
   const create = async () => {
     setLoading(true);
 
-    const messageBuffer = Buffer.from(message);
-    const messageBits = buffer2bits(messageBuffer);
-    const messageHash = mimc(...messageBits).toString().padStart(78, '0');
+    const msgBuff = Buffer.from(message);
+    const messageBits = buffer2bits(msgBuff);
+    var messageHash = BigInt(mimc(...messageBits)).toString(16);
+    if (messageHash.length % 2) {
+      messageHash = '0' + messageHash;
+    }
     const msg = Buffer.from(messageHash, 'hex');
-    const pPubKey = packPoint(publicKey);
-    const signature = sign(privateKey, msg);
+
+    const prvKey = Buffer.from('120304050607080900010203040506070809000102030405060708081101', 'hex');
+    const pubKey = prv2pub(prvKey);
+    const pPubKey = packPoint(pubKey);
+    const signature = sign(prvKey, msg);
     const pSignature = packSignature(signature);
 
     const aBits = buffer2bits(pPubKey);
     const rBits = buffer2bits(pSignature.slice(0, 32));
     const sBits = buffer2bits(pSignature.slice(32, 64));
     const msgBits = buffer2bits(msg);
+    const a = utils.leBuff2int(pPubKey);
+    const r = utils.leBuff2int(pSignature.slice(0,32));
+    const s = utils.leBuff2int(pSignature.slice(32,64));
+    const m = utils.leBuff2int(msg);
 
     const hash = mimc(...aBits).toString(); // fix
-    // const hashes =
   
-    const input = { publicKey: aBits, hashes: [hash], sig: [rBits, sBits], message: msgBits };
-    const proof = await proveSignature(aBits, [hash], [rBits, sBits], msgBits);
+    const proof = await proveSignature(aBits, [hash], rBits, s, m);
+    //const verified = await verifySignature(proof);
  
     post('/api/confessions/post', { message, proof, group })
     .then(data => {

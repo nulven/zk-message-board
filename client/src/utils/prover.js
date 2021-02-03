@@ -31,9 +31,9 @@ export async function proveHash(preImage, hash) {
   return prove('hash', { x: preImage, hash });
 }
 
-export async function proveSignature(publicKey, hashes, sig, message) {
+export async function proveSignature(publicKey, hashes, sigR8, sigS, message) {
   // prove that the signature is produced by the private key of the given public key
-  return prove('sig-check', { publicKey, hashes, sig, message });
+  return prove('sig-check', { publicKey, hashes, sigR8, sigS, message });
 }
 
 export async function verifyHash(proof) {
@@ -48,8 +48,6 @@ export async function fullVerifyHash(key, hash) {
   return verify('hash', proof, publicSignals);
 }
 
-export async function verifySignature(publicKey, publicKey2, hashes, sigR8, sig, message) {
-  const { proof, publicSignals } = await prove('sig-check', { publicKey, publicKey2, hashes, sigR8, sig, message });
-
-  return verify('sig-check', proof, publicSignals);
+export async function verifySignature(proof) {
+  return verify('sig-check', proof.proof, proof.publicSignals);
 }

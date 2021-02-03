@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const fs = require("fs");
 
 const {
   addUser,
@@ -25,6 +26,7 @@ const {
   createGroup,
   recordConfession,
   getGroups,
+  getGroupHashes,
   getConfessions,
 } = require("../../ethAPI.js");
 const { verifyKey, verifySignature } = require("../../verifier");
@@ -33,9 +35,14 @@ const { mimcHash } = require("../../mimc.js");
 const router = express.Router();
 const jsonParser = bodyParser.json();
 
+router.post("/write", jsonParser, async (req, res) => {
+  const { path, data } = req.body;
+  await fs.writeFile(__dirname + "/../../../" + path, data, () => {});
+  res.send({ success: true });
+});
+
 router.post("/groups/create", jsonParser, async (req, res) => {
   const { name } = req.body;
-  //const { id, password } = await createGroup(name);
   const { password } = await createGroup(name);
   res.send({ success: true, password });
 });
@@ -71,17 +78,14 @@ router.get("/confessions/:id", async (req, res) => {
 });
 */
 
-/*
-router.get("/groups/:id", async (req, res) => {
-  const id = req.params.id;
-  const group = await getGroup(id);
-  res.send({ success: true, group });
+router.get("/groups/:name", async (req, res) => {
+  const name = req.params.name;
+  const hashes = await getGroupHashes(name);
+  res.send({ success: true, hashes });
 });
-*/
 
 router.get("/confessions", jsonParser, async (req, res) => {
   const confessions = await getConfessions();
-  // const confessionsSorted = confessions.sort((a, b) => b.date - a.date);
   res.send({ success: true, confessions });
 });
 

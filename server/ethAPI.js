@@ -6,6 +6,7 @@ const signer = provider.getSigner();
 const { mimcHash, modPBigIntNative } = require("./mimc.js");
 //const contract = await connect('CoreValidator');
 
+
 async function connect(contractName) {
   const location = __dirname + "/../contracts/json/" + contractName + ".json";
   const contractJSON = JSON.parse(fs.readFileSync(location)); // .json
@@ -22,6 +23,7 @@ function uuidv4() {
     return v.toString(16);
   });
 }
+
 function randpassword() {
   return Math.floor(Math.random() * 100000000000);
 }
@@ -42,9 +44,7 @@ function randpassword() {
   return Math.floor(Math.random() * 100000000000);
 }
 
-// needs done
 async function createGroup(name) {
-  // returns {id, password}
   const contract = await connect("CoreValidator");
   const password = randpassword();
   const passwordHash = mimcHash(password);
@@ -80,7 +80,6 @@ async function addGroupMember(
 }
 
 async function recordConfession(message, proof, publicSignals, name) {
-  // returns null
   const contract = await connect("CoreValidator");
   const output = processProof(
     proof,
@@ -93,11 +92,10 @@ async function recordConfession(message, proof, publicSignals, name) {
   )
   .catch(err => {
     console.log(err);
-  }); // make sure solidity includes name
+  });
   return !!confession;
 }
 
-// needs done
 async function getGroups() {
   const contract = await connect("CoreValidator");
   const groups = await contract.getGroups();
@@ -112,7 +110,6 @@ async function getGroups() {
   return filteredGroups;
 }
 
-// needs done
 async function getConfessions() {
   const contract = await connect("CoreValidator");
   const confessions = await contract.getConfessions(); // update
@@ -126,6 +123,7 @@ async function getConfessions() {
   const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
   return filteredConfessions;
 }
+
 
 module.exports = {
   createGroup,

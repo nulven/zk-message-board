@@ -29,7 +29,7 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory a,
     uint256[2][2] memory b,
     uint256[2] memory c,
-    uint256[825] memory input,
+    uint256[3] memory input,
     string memory message,
     string memory groupName
   ) public returns (bool) {

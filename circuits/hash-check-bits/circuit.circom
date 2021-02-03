@@ -1,13 +1,15 @@
 include "../../node_modules/circomlib/circuits/mimcsponge.circom"
 
 template Main() {
-  signal private input x;
+  signal private input x[256];
   signal input hash;
 
   signal output out;
 
-  component mimc = MiMCSponge(1, 220, 1);
-  mimc.ins[0] <== x;
+  component mimc = MiMCSponge(256, 220, 1);
+  for (var i=0; i<256; i++) {
+    x[i] ==> mimc.ins[i];
+  }
   mimc.k <== 0;
 
   out <== mimc.outs[0];

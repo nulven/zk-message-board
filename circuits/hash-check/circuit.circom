@@ -1,26 +1,18 @@
 include "../../node_modules/circomlib/circuits/mimcsponge.circom"
 
-// 0 == (H(pk) - H(pk_1))*...*(H(pk) - H(pk_n))
-// Only true if pk == pk_i
+template Main() {
+  signal private input x;
+  signal input hash;
 
-template HashCheck(n) {
-  signal private input key;
-  signal input hashes[n];
+  signal output out;
 
   component mimc = MiMCSponge(1, 220, 1);
-  mimc.ins[0] <== key;
+  mimc.ins[0] <== x;
   mimc.k <== 0;
-  var out = mimc.outs[0];
 
-  signal poly[n+1];
-  var check[n];
-  poly[0] <== 1;
-  for (var i=0; i<n; i++) {
-    check[i] = out - hashes[i];
-    poly[i+1] <== poly[i] * check[i];
-  }
+  out <== mimc.outs[0];
 
-  poly[n] === 0;
+  out === hash;
 }
 
-component main = HashCheck(1);
+component main = Main();

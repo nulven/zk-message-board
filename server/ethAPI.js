@@ -85,8 +85,8 @@ function randpassword() {
 async function createGroup(name) {
   const contract = await connect("CoreValidator");
   const password = randpassword();
-  const passwordHash = mimcHash(password);
-  const group = await contract.createGroup(name, BigInt(passwordHash));
+  const passwordHash = mimcHash(password).toString();
+  const group = await contract.createGroup(name, passwordHash);
   return { password };
 }
 
@@ -134,6 +134,15 @@ async function recordConfession(message, proof, publicSignals, name) {
   return !!confession;
 }
 
+async function getGroupHashes(name) {
+  const contract = await connect("CoreValidator");
+  const groups = await contract.getAllHashedUsersByGroupName(name);
+  const parsedGroups = groups.map((group) => {
+    return group.toString();
+  });
+  return parsedGroups;
+}
+
 async function getGroups() {
   const contract = await connect('CoreValidator');
   const groups = await contract.getGroups();
@@ -151,7 +160,8 @@ async function getConfessions() {
     return { id: confession.id.toString(), message: confession.text, group: confession.group };
   });
   const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
-  return filteredConfessions;
+  const sortedConfessions = filteredConfessions.sort((a, b) => b.id - a.id);
+  return sortedConfessions;
 }
 
 
@@ -159,6 +169,7 @@ module.exports = {
   createGroup,
   addGroupMember,
   getGroups,
+  getGroupHashes,
   getConfessions,
   recordConfession
 };

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Loader from 'react-loader-spinner';
 
 import TextInput from '../components/TextInput';
+import Select from 'react-select';
 import Spinner from '../components/Spinner';
 import { Button } from '../components/Button';
 import { Large } from '../components/text';
@@ -31,9 +32,15 @@ const Header = styled.p`
   padding-left: 5px;
 `;
 
+const SelectGroup = styled(Select)`
+  width: 100%;
+  height: 10%;
+
+`;
+
 const MessageInput = styled(TextInput)`
   display: flex;
-  width: 10%;
+  width: 100%;
   height: 10%;
   margin-left: 45%;
   margin-right: 45%;
@@ -44,6 +51,7 @@ const MessageInput = styled(TextInput)`
 
 const NewConfession = (props) => {
   const [group, setGroup] = useState(null);
+  const [groups, setGroups] = useState([]);
   const [message, setMessage] = useState(null);
   const [publicKey, setPublicKey] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
@@ -52,18 +60,30 @@ const NewConfession = (props) => {
   const [passwordHash, setPasswordHash] = useState(null);
 
   useEffect(() => {
-    loadKey();
+    loadGroups();
   }, []);
+  useEffect(() => {
+    loadKeys();
+  }, [group]);
 
-  const loadKey = async () => {
-    const publicKeyMaybe = localStorage.getItem(`publicKey`);
-    const privateKeyMaybe = localStorage.getItem(`privateKey`);
-    const groupMaybe = localStorage.getItem(`group`);
-    if (publicKeyMaybe !== null && privateKeyMaybe !== null && groupMaybe !== null) {
+  const loadGroups = async () => {
+    const groupsMaybe = localStorage.getItem(`groups`);
+    if (groupsMaybe !== null) {
+      if (true) {
+        setGroups(groupsMaybe.split(','));
+        setGroup(groupsMaybe.split(',')[0]);
+      } else {
+        console.log('You are not a member of any group');
+      }
+    }
+  };
+  const loadKeys = async () => {
+    const publicKeyMaybe = localStorage.getItem(`${group}_publicKey`);
+    const privateKeyMaybe = localStorage.getItem(`${group}_privateKey`);
+    if (publicKeyMaybe !== null && privateKeyMaybe !== null) {
       if (true) {
         setPublicKey(publicKeyMaybe.split(',').map(v => BigInt(v)));
         setPrivateKey(privateKeyMaybe);
-        setGroup(groupMaybe);
       } else {
         console.log('Key is not valid');
       }
@@ -95,30 +115,36 @@ const NewConfession = (props) => {
     }
     const msg = Buffer.from(messageHash, 'hex');
 
-    const prvKey = Buffer.from('120304050607080900010203040506070809000102030405060708081101', 'hex');
-    const pubKey = prv2pub(prvKey);
-    const pPubKey = packPoint(pubKey);
-    const signature = sign(prvKey, msg);
+    const pPublicKey = packPoint(publicKey);
+
+    const signature = sign(privateKey, msg);
     const pSignature = packSignature(signature);
 
-    const aBits = buffer2bits(pPubKey);
+    const aBits = buffer2bits(pPublicKey);
     const rBits = buffer2bits(pSignature.slice(0, 32));
     const sBits = buffer2bits(pSignature.slice(32, 64));
     const msgBits = buffer2bits(msg);
-    const a = utils.leBuff2int(pPubKey);
+    //const a = utils.leBuff2int(pPublicKey);
     const r = utils.leBuff2int(pSignature.slice(0,32));
     const s = utils.leBuff2int(pSignature.slice(32,64));
     const m = utils.leBuff2int(msg);
 
-    const hash = mimc(...aBits).toString(); // fix
-  
-    const proof = await proveSignature(aBits, [hash], rBits, s, m);
-    //const verified = await verifySignature(proof);
- 
-    post('/api/confessions/post', { message, proof, group })
-    .then(data => {
+    get(`/api/groups/${group}`, {})
+    .then(async data => {
       if (data.success) {
-        props.history.push('/confessions');
+        const input = { publicKey: aBits, hashes: data.hashes, sigR8: rBits, sigS: s.toString(), message: m.toString() };
+        const proof = await proveSignature(aBits, data.hashes, rBits, s, m);
+        const verified = await verifySignature(proof);
+     
+        post('/api/confessions/post', { message, proof, group })
+        .then(data => {
+          if (data.success) {
+            props.history.push('/confessions');
+          } else {
+            console.log(data.error);
+          }
+          setLoading(false);
+        });
       } else {
         console.log(data.error);
       }
@@ -130,6 +156,10 @@ const NewConfession = (props) => {
     stateSetter(value);
   };
 
+  const onChangeGroup = ({ value, label }) => {
+    setGroup(value);
+  };
+
   return (
     <>
       {!loading ?
@@ -137,10 +167,11 @@ const NewConfession = (props) => {
           <Large>Post confession</Large>
           <Wrapper>
             <Header>Group</Header>
-            <TextInput
-              placeholder={group}
-              onChange={onChange(setGroup)}
-              value={group}
+            <SelectGroup
+              options={groups.map(group => {
+                return { value: group, label: group }
+              })}
+              onChange={onChangeGroup}
             />
           </Wrapper>
           <Wrapper>

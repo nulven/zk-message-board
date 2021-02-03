@@ -80,6 +80,7 @@ const Groups = (props) => {
         {groups.map((group) => {
           return <Group
             {...group}
+            key={group.name}
             onClick={sendToGroup(group)}
           />;
         })}

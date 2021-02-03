@@ -12,7 +12,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.7.6; // >=0.5.16 <=
-import "./Pairing.sol";
+import './Pairing.sol';
 
 library HashVerifier {
   using Pairing for *;

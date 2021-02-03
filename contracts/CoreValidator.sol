@@ -2,7 +2,8 @@
 pragma solidity 0.7.6; // >=0.5.16 <=
 pragma experimental ABIEncoderV2;
 import "./SigCheckVerifier.sol";
-import "./HashVerifier.sol";
+import "./HashCheckVerifier.sol";
+import "./HashCheckBitsVerifier.sol";
 import "./ContractStorage.sol";
 import "./Pairing.sol";
 
@@ -29,11 +30,14 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory a,
     uint256[2][2] memory b,
     uint256[2] memory c,
-    uint256[3] memory input,
+    uint256[12] memory input,
     string memory message,
     string memory groupName
   ) public returns (bool) {
-    require(SigCheckVerifier.verifyProof(a, b, c, input), "Proof invalid!");
+    require(
+      SigCheckVerifier.verifyProof(a, b, c, input),
+      "Proof invalid!"
+    );
     pfsVerified += 1;
     emit ProofVerified(pfsVerified);
 
@@ -59,23 +63,22 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory passwordInput,
     string memory groupName
   ) public returns (bool) {
-    /*
     require(
       passwordInput[0] == groups[groupIDs[groupName]].passwordHash,
       "Wrong pass hash!"
     );
-    */
     require(
-      HashVerifier.verifyProof(keyA, keyB, keyC, keyInput),
+      HashCheckBitsVerifier.verifyProof(keyA, keyB, keyC, keyInput),
       "Key proof invalid!"
     );
     require(
-      HashVerifier.verifyProof(passwordA, passwordB, passwordC, passwordInput),
+      HashCheckVerifier.verifyProof(passwordA, passwordB, passwordC, passwordInput),
       "Password proof invalid!"
     );
     addUserToGroup(groupName, keyInput[0]);
     pfsVerified += 1;
     emit ProofVerified(pfsVerified);
+    return true;
   }
 
   // GETTERS AND SETTERS
@@ -126,6 +129,7 @@ contract CoreValidator is ContractStorage {
   // GETTERS
   function getAllHashedUsersByGroupID(uint256 groupID)
     public
+    view
     returns (uint256[MAX_USERS] memory)
   {
     require(groupCount > groupID, "Not enough groups!");
@@ -134,6 +138,7 @@ contract CoreValidator is ContractStorage {
 
   function getAllHashedUsersByGroupName(string memory groupName)
     public
+    view
     returns (uint256[MAX_USERS] memory)
   {
     return getAllHashedUsersByGroupID(groupIDs[groupName]);

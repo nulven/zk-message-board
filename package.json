@@ -10,6 +10,7 @@
     "client": "$(npm bin)/webpack --mode development --watch",
     "dev": "$(npm bin)/concurrently \"npm run client\" \"npm run server\"",
     "compile": "node ./circuits/builder.js circuits-compiled keys true",
+    "compile-dev": "node ./circuits/builder.js circuits-compiled keys false",
     "compile-solidity": "node ./circuits/solbuilder.js "
   },
   "repository": {

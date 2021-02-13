@@ -14,7 +14,7 @@ let potFile = process.argv[6];
 if (process.argv.length !== 7) {
   console.log("usage");
   console.log(
-    "builder comma,seperated,list,of,circuits wasm_out_path zkey_out_path [`true` if deterministic / `false` if not]"
+    "builder comma,seperated,list,of,circuits wasm_out_path zkey_out_path [`true` if deterministic / `false` if not] pot_size \n for example, $ node circuits/builder.js . . false sig-check 20"
   );
   process.exit(1);
 }
@@ -27,7 +27,7 @@ const cwd = process.cwd();
 
 for (circuitName of circuitsList.split(",")) {
   if (deterministic && !process.env["beacon"]) {
-    console.log("ERROR! you probably dont have an .env file");
+    console.log("ERROR! Can't find a sourced .env with a beacon variable");
     process.exit(1);
   }
 
@@ -83,16 +83,13 @@ for (circuitName of circuitsList.split(",")) {
       { stdio: "inherit" }
     );
     execSync(
-      'npx snarkjs groth16 verify verification_key.json public.json proof.json',
-      { stdio: 'inherit' }
+      "npx snarkjs groth16 verify verification_key.json public.json proof.json",
+      { stdio: "inherit" }
     );
-    execSync(
-      'mkdir -p ../circuits-compiled/' + circuitName,
-      { stdio: 'inherit' }
-    );
-    execSync(
-      'mkdir -p ../keys/' + circuitName,
-      { stdio: 'inherit' }
+    execSync("mkdir -p ../circuits-compiled/" + circuitName, {
+      stdio: "inherit",
+    });
+    execSync("mkdir -p ../keys/" + circuitName, { stdio: "inherit" });
     fs.copyFileSync(
       "circuit.wasm",
       cwd + "/circuits/" + wasmOutPath + "/" + circuitName + "/circuit.wasm"

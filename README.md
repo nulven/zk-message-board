@@ -1,33 +1,54 @@
 # ZK MiMC Hash Verifier
 
 ## Setup and Run
-Use Node v14
+
+Start your own hardhat chain
+
 ```
+yarn chain
+```
+
+Use Node v14
+
+```
+nvm use 14.15.3
 npm install
+cd contracts
+node deploy.ts
+cd ..
+npm run compile-dev hash-check 15
+npm run compile-dev hash-check-bits 20
+npm run compile-dev sig-check 20
+npm run compile hash-check 15
+npm run compile hash-check-bits 20
+npm run compile sig-check 20
 ```
 
 Run the local server and client watcher
+
 ```
 npm run dev
 ```
 
 ## Circuits
-| Circuit Name | Private Inputs | Public Inputs | Outputs | Description |
-| ------------ | -------------- | ------------- | ------- | ----------- |
-| `hash`       | `x` | `hash` | `out` | Checks if `MiMC(x) = hash`; outputs `MiMC(x)` |
-| `hash-check` | `key` | `hashes` | None | Checks if `MiMC(x)` is in list `hashes` |
-| `sig-check`  | `publicKey` | `hashes`, `sig`, `message` | None | Checks `eddsa_verify(publicKey, sig, message) == true`; checks `MiMIC(publicKey)` is in list `hashes` |
+
+| Circuit Name | Private Inputs | Public Inputs              | Outputs | Description                                                                                           |
+| ------------ | -------------- | -------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| `hash`       | `x`            | `hash`                     | `out`   | Checks if `MiMC(x) = hash`; outputs `MiMC(x)`                                                         |
+| `hash-check` | `key`          | `hashes`                   | None    | Checks if `MiMC(x)` is in list `hashes`                                                               |
+| `sig-check`  | `publicKey`    | `hashes`, `sig`, `message` | None    | Checks `eddsa_verify(publicKey, sig, message) == true`; checks `MiMIC(publicKey)` is in list `hashes` |
 
 ### 'sig-check'
-| Inputs | Private | Type | Description |
-| ------ | ------- | ---- | ----------- |
-| 'publicKey' | Yes | 256-bit | EdDSA public key |
-| 'hashes' | No | `[]` | Registered public key hashes |
-| 'sig' | No | 2-by-256-bit array | EdDSA signature |
-| 'message' | No | 312-bit array | binary representation of the MiMC hash of the message |
 
+| Inputs      | Private | Type               | Description                                           |
+| ----------- | ------- | ------------------ | ----------------------------------------------------- |
+| 'publicKey' | Yes     | 256-bit            | EdDSA public key                                      |
+| 'hashes'    | No      | `[]`               | Registered public key hashes                          |
+| 'sig'       | No      | 2-by-256-bit array | EdDSA signature                                       |
+| 'message'   | No      | 312-bit array      | binary representation of the MiMC hash of the message |
 
 Example use
+
 ```
 import { babyJub, eddsa } from 'circomlib';
 import mimc from 'client/utils/mimc';
@@ -69,16 +90,17 @@ const sig = [rBits, sBits];
 const hash = mimc(...aBits).toString();
 
 const inputs = { publicKey: aBits, hashes: [hash], signature: sig, message: msgBits };
- ```
+```
 
 ## Add a circuit
+
 Make a new directory in `/circuits/` with the name of the circuit.
 
 Copy the `pot15_final.ptau` file from `/circuits/hash` into the new directory.
 
 In the new directory, create `circuit.circom` and `input.json` with the test inputs.
 
-Run `npm run compile CIRCUIT_NAME`.
+Run `npm run compile CIRCUIT_NAME`, if that doesn't work `npm run compile CIRCUIT_NAME 20`. If it complains about an env file in development, use `compile-dev` instead of `compile`.
 If the circuit and input produce a valid proof you should see `OK`.
 
 The compiled `circuit.wasm` file will be in `/circuits/circuits-compiled/CIRCUIT_NAME`.
@@ -86,16 +108,20 @@ The proof key `circuit_final.zkey` and the verification key `verification_key.js
 
 An example of creating and verifying a new proof in Node can be found in `/client/prover.js`.
 
+Run `./solbuilder.js` to generate Solidity from the contracts.
 
 ## How it works
+
 1. User generates EdDSA key pair `(pk, sk)` and sends the MiMC hash to the server `H(pk)`.
 2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have the public key `pk` to one of the recorded MiMC hashes.
 3. Then, the user sends an EdDSA signature of the vote and a snark proving that the signature was produced by the private key associated with the public key they just verified.
 
 ## Poll Database
+
 All of the poll information is stored locally in `.txt` files.
 
 `/server/polls` stores the data in separate files named `POLL_ID.txt`, where the first line is as follows
+
 ```
 POLL_ID,TITLE,MAX_USERS
 ```
@@ -103,6 +129,15 @@ POLL_ID,TITLE,MAX_USERS
 Each line after this is a MiMC hash of a user who registered with the poll.
 
 `/server/votes` stores the vote in separate files named `POLL_ID.txt`, where each line represents one vote
+
 ```
 VOTE,SIGNATURE
 ```
+
+## Common Errors
+
+```
+When I call a contract from frontend, some path doesnt work -- I see 'call revert exception' or 'calling an account which is not a contract'
+```
+
+The chain probably doesn't know the contract address. In our experience, restarting chain and redeploying has worked for us.

@@ -1,10 +1,15 @@
 import React, { useEffect } from 'react';
 import { Route } from 'react-router-dom';
+import styled from 'styled-components';
 
 import NavigationBar from './NavigationBar';
 import OurThemeProvider from './OurThemeProvider';
 
 const defaultTitle = '';
+
+const SubpageWrapper = styled.div`
+  height: calc(100% - 56px - 1px);
+`;
 
 interface Props {
   path: string;
@@ -28,7 +33,9 @@ export default function Page(props: Props) {
       render={(props: any) => (
         <OurThemeProvider>
           <NavigationBar activeTab={path} />
-          <Subpage {...props} />
+          <SubpageWrapper>
+            <Subpage {...props} />
+          </SubpageWrapper>
         </OurThemeProvider>
       )}
     />

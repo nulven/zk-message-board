@@ -8,13 +8,21 @@ import { Large } from '../components/text';
 import { post } from '../utils/api';
 
 
+const NewGroupWrapper = styled.div`
+  margin-top: 10%;
+  padding-left: 5%;
+  padding-right: 5%;
+`;
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
+  margin-bottom: 10px;
 `;
 
-const Spacer = styled.div`
-  height: 30px;
+const Title = styled(Large)`
+  font-size: 30px;
+  margin-bottom: 10px;
 `;
 
 const Header = styled.p`
@@ -44,8 +52,12 @@ const NewGroup = (props) => {
     stateSetter(value);
   };
 
+  const sendToGroups = () => {
+    props.history.push('/groups');
+  };
+
   return (
-    <>
+    <NewGroupWrapper>
       {groupCreated ?
         <>
           <p>Group successfully created</p>
@@ -53,21 +65,24 @@ const NewGroup = (props) => {
         </>
        : 
         <>
-          <Large>Create Group</Large>
+          <Title>Create Group</Title>
           <Wrapper>
-            <Header>Name</Header>
             <TextInput
               placeholder={null}
               onChange={onChange(setName)}
               value={name}
+              header={'Group Name'}
             />
           </Wrapper>
           <Button onClick={create}>
             Create
           </Button>
+          <Button onClick={sendToGroups}>
+            Cancel
+          </Button>
         </>
       }
-    </>
+    </NewGroupWrapper>
   );
 }
 

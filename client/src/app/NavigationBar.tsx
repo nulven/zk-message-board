@@ -58,21 +58,6 @@ const NavigationBar = (props: NavigationBarProps) => {
   return (
     <NavigationBarWrapper>
       <NavigationBarElement
-        path='/'
-        title='Home'
-        activeTab={props.activeTab}
-      />
-      <NavigationBarElement
-        path='/polls'
-        title='Polls'
-        activeTab={props.activeTab}
-      />
-      <NavigationBarElement
-        path='/hash'
-        title='Hash'
-        activeTab={props.activeTab}
-      />
-      <NavigationBarElement
         path='/groups'
         title='Groups'
         activeTab={props.activeTab}

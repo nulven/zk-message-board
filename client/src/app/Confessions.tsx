@@ -11,6 +11,15 @@ import Confession from './Confession';
 
 
 const ConfessionsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+const ConfessionsList = styled.div`
+  padding-top: 5%;
+  height: 100%;
+  background-color: ${props => props.theme.color.grey70};
 `;
 
 const Confessions = (props) => {
@@ -40,19 +49,19 @@ const Confessions = (props) => {
   };
 
   return (
-    <>
+    <ConfessionsWrapper>
       <Button
         onClick={sendToNewConfession}>
         Post confession
       </Button>
-      <ConfessionsWrapper>
+      <ConfessionsList>
         {confessions.map((confession) => {
           return (
               <Confession {...confession} key={confession.id} />
           );
         })}
-      </ConfessionsWrapper>
-    </>
+      </ConfessionsList>
+    </ConfessionsWrapper>
   );
 }
 

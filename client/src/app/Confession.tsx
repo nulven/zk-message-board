@@ -17,6 +17,8 @@ const ConfessionWrapper = styled.div`
   margin-left: 15%;
   margin-right: 15%;
   height: 100px;
+  background-color: ${props => props.theme.color.white};
+  margin-bottom: 10px;
 `;
 
 const Group = styled.div`
@@ -37,7 +39,7 @@ const Spacer = styled.div`
   margin-left: 15%;
   margin-right: 15%;
   height: 10px;
-  background-color: gray;
+  background-color: ${props => props.theme.color.grey70};
 `;
 
 type ConfessionProps = {
@@ -54,7 +56,6 @@ const Confession = (props: ConfessionProps) => {
         <Group>Post by someone in {props.group}</Group>
         <Message>{props.message}</Message>
       </ConfessionWrapper>
-      <Spacer />
     </>
   );
 }

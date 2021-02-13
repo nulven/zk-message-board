@@ -5,7 +5,7 @@
   "main": "./client/index.tsx",
   "scripts": {
     "build": "$(npm bin)/webpack --mode development ",
-    "server": "nodemon ./server/app.js",
+    "server": "nodemon --watch server ./server/app.js",
     "babel": "babel --presets es2015 client/index.js -o ./lib/index.js",
     "client": "$(npm bin)/webpack --mode development --watch",
     "dev": "$(npm bin)/concurrently \"npm run client\" \"npm run server\"",

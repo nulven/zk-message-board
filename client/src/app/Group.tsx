@@ -8,7 +8,7 @@ const { verify } = eddsa;
 import TextInput from '../components/TextInput';
 import Spinner from '../components/Spinner';
 import { Button } from '../components/Button';
-import { Large } from '../components/text';
+import { Large, Medium } from '../components/text';
 
 import bigInt from 'big-integer';
 import mimc from '../utils/mimc';
@@ -23,6 +23,10 @@ const Wrapper = styled.div`
   justify-content: space-between;
 `;
 
+const Error = styled(Medium)`
+  color: ${props => props.theme.color.red};
+`;
+
 const Group = (props) => {
   const name = props.match.params.name;
   const group = props.location.state.group;
@@ -31,6 +35,7 @@ const Group = (props) => {
   const [publicKey, setPublicKey] = useState(null);
   const [privateKey, setPrivateKey] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadKey();
@@ -68,10 +73,9 @@ const Group = (props) => {
   }
 
   const register = async () => {
-    //if (passwordHash === group.passwordHash) {
     setLoading(true);
-    if (true) {
-      const passwordHash = mimc(password).toString();
+    const passwordHash = mimc(password).toString();
+    if (passwordHash === group.passwordHash) {
       const passwordProof = await proveHash(password, passwordHash);
 
       const { publicKey, privateKey } = generateKey();
@@ -92,16 +96,17 @@ const Group = (props) => {
           const newGroups = groups;
           newGroups.push(name);
           setGroups(newGroups);
-          setLoading(false);
           localStorage.setItem(`${name}_publicKey`, publicKey);
           localStorage.setItem(`${name}_privateKey`, privateKey.toString());
           localStorage.setItem(`groups`, newGroups.toString());
+          setLoading(false);
           setPublicKey(publicKey);
           setPrivateKey(privateKey.toString());
         }
       });
     } else {
-      console.log('Incorrect password');
+      setError('Incorrect password');
+      setLoading(false);
     }
   };
 
@@ -125,6 +130,7 @@ const Group = (props) => {
                 onChange={onChange(setPassword)}
                 value={password}
               />
+              {!!error ? <Error>{error}</Error> : null}
               <Button onClick={register}>
                 Generate key
               </Button>

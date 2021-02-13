@@ -16,30 +16,30 @@ const ConfessionWrapper = styled.div`
   width: 70%;
   margin-left: 15%;
   margin-right: 15%;
+  padding: 5px;
   height: 100px;
   background-color: ${props => props.theme.color.white};
   margin-bottom: 10px;
 `;
 
 const Group = styled.div`
+  margin-left: 5px;
+  color: ${props => props.theme.color.grey70};
+  font-weight: bold;
+`;
+
+const GroupHeader = styled.div`
+  display: flex;
+  flex-direction: row;
   width: 100%;
   height: 15px;
-  padding-left: 5px;
   margin-bottom: 10px;
-  margin-top: 5px
+  color: ${props => props.theme.color.grey70};
 `;
 
 const Message = styled.div`
   width: 100%;
   padding-left: 5px;
-`;
-
-const Spacer = styled.div`
-  width: calc(70% + 2px);
-  margin-left: 15%;
-  margin-right: 15%;
-  height: 10px;
-  background-color: ${props => props.theme.color.grey70};
 `;
 
 type ConfessionProps = {
@@ -53,7 +53,10 @@ const Confession = (props: ConfessionProps) => {
   return (
     <>
       <ConfessionWrapper>
-        <Group>Post by someone in {props.group}</Group>
+        <GroupHeader>
+          {'Posted by someone in'}
+          <Group>{props.group}</Group>
+        </GroupHeader>
         <Message>{props.message}</Message>
       </ConfessionWrapper>
     </>

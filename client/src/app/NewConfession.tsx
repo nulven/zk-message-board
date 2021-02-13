@@ -122,10 +122,14 @@ const NewConfession = (props) => {
 
     const aBits = buffer2bits(pPublicKey);
     const rBits = buffer2bits(pSignature.slice(0, 32));
+    const rBits1 = buffer2bits(pSignature.slice(0,16));
+    const rBits2 = buffer2bits(pSignature.slice(16));
     const sBits = buffer2bits(pSignature.slice(32, 64));
     const msgBits = buffer2bits(msg);
     //const a = utils.leBuff2int(pPublicKey);
     const r = utils.leBuff2int(pSignature.slice(0,32));
+    const r1 = utils.leBuff2int(pSignature.slice(0,16));
+    const r2 = utils.leBuff2int(pSignature.slice(16));
     const s = utils.leBuff2int(pSignature.slice(32,64));
     const m = utils.leBuff2int(msg);
 
@@ -133,8 +137,9 @@ const NewConfession = (props) => {
     .then(async data => {
       if (data.success) {
         const input = { publicKey: aBits, hashes: data.hashes, sigR8: rBits, sigS: s.toString(), message: m.toString() };
-        const proof = await proveSignature(aBits, data.hashes, rBits, s, m);
+        const proof = await proveSignature(aBits, data.hashes, [r1, r2], s, m);
         const verified = await verifySignature(proof);
+        console.log(verified);
      
         post('/api/confessions/post', { message, proof, group })
         .then(data => {

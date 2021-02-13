@@ -19,6 +19,9 @@ const compiler = webpack(config);
 if (!fs.existsSync(__dirname + '/../contracts/json')) {
   fs.mkdirSync(__dirname + '/../contracts/json');
 }
+if (!fs.existsSync(__dirname + '/../contracts/deploy')) {
+  fs.mkdirSync(__dirname + '/../contracts/deploy');
+}
 if (!fs.existsSync(__dirname + '/polls')) {
   fs.mkdirSync(__dirname + '/polls');
 }

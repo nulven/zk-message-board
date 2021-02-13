@@ -1,14 +1,22 @@
-const { Contract, ContractFactory, providers } = require("ethers");
+require("dotenv").config();
+const { Contract, ContractFactory, providers, Wallet } = require("ethers");
 const fetch = require("node-fetch");
 const fs = require("fs");
-const provider = new providers.JsonRpcProvider("http://localhost:8545");
-const signer = provider.getSigner();
 const { mimcHash, modPBigIntNative } = require("./mimc.js");
-//const contract = await connect('CoreValidator');
+
+const projectId = process.env.PROJECT_ID;
+const network_url = process.env.NODE_ENV === "production" ? `https://ropsten.infura.io/v3/${projectId}` : 'http://localhost:8545';
+const provider = new providers.JsonRpcProvider(network_url);
+
+const mnemonic = process.env.MNEMONIC;
+const path = process.env.WALLET_PATH;
+const folder = process.env.NODE_ENV === "production" ? 'deploy' : 'json';
+const walletMnemonic = Wallet.fromMnemonic(mnemonic, path).connect(provider);
+const signer = walletMnemonic;
 
 
 async function connect(contractName) {
-  const location = __dirname + "/../contracts/json/" + contractName + ".json";
+  const location = __dirname + `/../contracts/${folder}/` + contractName + ".json";
   const contractJSON = JSON.parse(fs.readFileSync(location)); // .json
   const contractABI = contractJSON.abi;
   const contractAddress = contractJSON.address;
@@ -18,9 +26,6 @@ async function connect(contractName) {
 
 async function runTests() {
   await this.coreValidator.createGroup("asdf", 1);
-  console.log(await this.coreValidator.getConfessions());
-  console.log(await this.coreValidator.getGroups());
-  console.error("65");
   const sig_check_proof_json = JSON.parse(
     fs.readFileSync("json/sigCheckProof.json")
   );
@@ -33,14 +38,12 @@ async function runTests() {
   const hash_public_json = JSON.parse(
     fs.readFileSync("json/sigCheckPublic.json")
   );
-  console.error("78");
   const pollName = "myPoll";
   const answerValid = await this.coreValidator.verifyAndStoreRegistration(
     ...callArgsFromProofAndSignals(hash_proof_json, hash_public_json),
     ...callArgsFromProofAndSignals(sig_check_proof_json, sig_check_public_json),
     pollName
   );
-  console.error("88");
 
   const addedMessage = await this.coreValidator.verifyAndAddMessage(
     ...callArgsFromProofAndSignals(hash_proof_json, hash_public_json),
@@ -51,8 +54,6 @@ async function runTests() {
     hash_public_json[0]
   );
   assert(isRegistered == 1); // Pass
-  console.error("99");
-  console.log(answerValid);
 }
 
 function uuidv4() {

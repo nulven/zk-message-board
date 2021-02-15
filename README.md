@@ -123,3 +123,15 @@ Each line after this is a MiMC hash of a user who registered with the poll.
 ```
 VOTE,SIGNATURE
 ```
+
+## Environment Variables
+
+.env has a beacon to do the MPC. Also, node_env can be development which simply queries the local hardhat chain, or production which queries ropsten.
+
+## Common Errors
+
+```
+When I call a contract from frontend, some path doesnt work -- I see 'call revert exception' or 'calling an account which is not a contract'
+```
+
+The chain probably doesn't know the contract address. In our experience, restarting chain and redeploying has worked for us.

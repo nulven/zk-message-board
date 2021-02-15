@@ -30,14 +30,11 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory a,
     uint256[2][2] memory b,
     uint256[2] memory c,
-    uint256[12] memory input,
+    uint256[14] memory input,
     string memory message,
     string memory groupName
   ) public returns (bool) {
-    require(
-      SigCheckVerifier.verifyProof(a, b, c, input),
-      "Proof invalid!"
-    );
+    require(SigCheckVerifier.verifyProof(a, b, c, input), "Proof invalid!");
     pfsVerified += 1;
     emit ProofVerified(pfsVerified);
 
@@ -72,7 +69,12 @@ contract CoreValidator is ContractStorage {
       "Key proof invalid!"
     );
     require(
-      HashCheckVerifier.verifyProof(passwordA, passwordB, passwordC, passwordInput),
+      HashCheckVerifier.verifyProof(
+        passwordA,
+        passwordB,
+        passwordC,
+        passwordInput
+      ),
       "Password proof invalid!"
     );
     addUserToGroup(groupName, keyInput[0]);

@@ -16,6 +16,7 @@ const selfTheme = {
     grey10: '#F8F9FB',
     blue: '#0068FF',
     dark: '#000000',
+    red: 'red',
   },
   text: {
     small: { size: '14px', lineHeight: '1.71' },

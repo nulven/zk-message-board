@@ -16,11 +16,26 @@ const app = express();
 const compiler = webpack(config);
 
 
+if (!fs.existsSync(__dirname + '/../contracts/json')) {
+  fs.mkdirSync(__dirname + '/../contracts/json');
+}
+if (!fs.existsSync(__dirname + '/../contracts/deploy')) {
+  fs.mkdirSync(__dirname + '/../contracts/deploy');
+}
 if (!fs.existsSync(__dirname + '/polls')) {
   fs.mkdirSync(__dirname + '/polls');
 }
 if (!fs.existsSync(__dirname + '/votes')) {
   fs.mkdirSync(__dirname + '/votes');
+}
+if (!fs.existsSync(__dirname + '/data')) {
+  fs.mkdirSync(__dirname + '/data');
+}
+if (!fs.existsSync(__dirname + '/data/confessions')) {
+  fs.mkdirSync(__dirname + '/data/confessions');
+}
+if (!fs.existsSync(__dirname + '/data/groups')) {
+  fs.mkdirSync(__dirname + '/data/groups');
 }
 
 app.use('/', express.static(__dirname + '/../'));

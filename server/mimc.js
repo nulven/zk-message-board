@@ -279,7 +279,8 @@ const modPBigInt = (x) => {
   return ret;
 };
 
-const modPBigIntNative = (x) => {
+const modPBigIntNative = (y) => {
+  const x = bigInt(y);
   let ret = x.mod(p);
   if (ret.lesser(bigInt(0))) {
     ret = ret.add(p);
@@ -296,4 +297,4 @@ const mimcWithRounds = (rounds) => (...inputs) =>
 
 const mimcHash = mimcWithRounds(220);
 
-module.exports = { mimcHash };
+module.exports = { mimcHash, modPBigIntNative };

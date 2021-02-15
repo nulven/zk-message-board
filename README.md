@@ -2,12 +2,32 @@
 
 ## Setup and Run
 
-Use Node v14
+Use Node v14. If you don't have it, do:
 
 ```
 nvm install 14.15.3
 npm -v # 14.15.3
+```
+
+Start your own hardhat chain
+
+```
+yarn chain
+```
+
+Use Node v14
+```
+nvm use 14.15.3
 npm install
+cd contracts
+node deploy.ts
+cd ..
+npm run compile-dev hash-check 15
+npm run compile-dev hash-check-bits 20
+npm run compile-dev sig-check 20
+npm run compile hash-check 15
+npm run compile hash-check-bits 20
+npm run compile sig-check 20
 ```
 
 Run the local server and client watcher
@@ -88,13 +108,15 @@ Copy the `pot15_final.ptau` file from `/circuits/hash` into the new directory.
 
 In the new directory, create `circuit.circom` and `input.json` with the test inputs.
 
-Run `npm run compile CIRCUIT_NAME`.
+Run `npm run compile CIRCUIT_NAME`, if that doesn't work `npm run compile CIRCUIT_NAME 20`. If it complains about an env file in development, use `compile-dev` instead of `compile`.
 If the circuit and input produce a valid proof you should see `OK`.
 
 The compiled `circuit.wasm` file will be in `/circuits/circuits-compiled/CIRCUIT_NAME`.
 The proof key `circuit_final.zkey` and the verification key `verification_key.json` will be found in `/circuits/keys/CIRCUIT_NAME`.
 
 An example of creating and verifying a new proof in Node can be found in `/client/prover.js`.
+
+Run `./solbuilder.js` to generate Solidity from the contracts.
 
 ## How it works
 

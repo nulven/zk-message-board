@@ -1,3 +1,4 @@
+require('dotenv').config({ path: __dirname + '/../.env' });
 const { Contract, ContractFactory, providers, Wallet } = require("ethers");
 const linker = require("solc/linker");
 const solc = require("solc");
@@ -10,7 +11,12 @@ const provider = new providers.JsonRpcProvider(network_url);
 const mnemonic = process.env.MNEMONIC;
 const path = process.env.WALLET_PATH;
 const walletMnemonic = Wallet.fromMnemonic(mnemonic, path).connect(provider);
-const signer = walletMnemonic;
+var signer;
+if (process.env.NODE_ENV === 'production') {
+  signer = walletMnemonic;
+} else {
+  signer = provider.getSigner();
+}
 
 // first string is .sol, rest do not have that ending
 deploy("CoreValidator.sol", [
@@ -94,18 +100,23 @@ async function deploy(fileName, libraries = []) {
     );
     bytecode = linker.linkBytecode(bytecode, linkReferences);
 
-    const factory = await new ContractFactory(abi, bytecode, signer);
-    const contractObject = await factory.deploy();
-    librariesAddresses[name] = contractObject.address;
-    const folder = process.env.NODE_ENV === "production" ? 'deploy' : 'json';
-    fs.writeFileSync(
-      `${folder}/` + name + ".json",
-      JSON.stringify({
-        abi: abi,
-        address: contractObject.address,
-      })
-    );
+    try {
+      const factory = await new ContractFactory(abi, bytecode, signer);
+      const contractObject = await factory.deploy();
+      librariesAddresses[name] = contractObject.address;
+      const folder = process.env.NODE_ENV === "production" ? 'deploy' : 'json';
+      fs.writeFileSync(
+        `${folder}/` + name + ".json",
+        JSON.stringify({
+          abi: abi,
+          address: contractObject.address,
+        })
+      );
+      
+      return { name, bytecode, abi, address: contractObject.address };
+    } catch (err) {
+      console.log(err);
+    }
 
-    return { name, bytecode, abi, address: contractObject.address };
   }
 }

@@ -12,7 +12,14 @@ const mnemonic = process.env.MNEMONIC;
 const path = process.env.WALLET_PATH;
 const folder = process.env.NODE_ENV === "production" ? 'deploy' : 'json';
 const walletMnemonic = Wallet.fromMnemonic(mnemonic, path).connect(provider);
-const signer = walletMnemonic;
+var signer;
+if (process.env.NODE_ENV === 'production') {
+  signer = walletMnemonic;
+} else {
+  signer = provider.getSigner();
+}
+
+const options = { gasPrice: 1000000000, gasLimit: 85000000 };
 
 
 async function connect(contractName) {
@@ -85,11 +92,15 @@ function randpassword() {
 }
 
 async function createGroup(name) {
-  const contract = await connect("CoreValidator");
-  const password = randpassword();
-  const passwordHash = mimcHash(password).toString();
-  const group = await contract.createGroup(name, passwordHash);
-  return { password };
+  try {
+    const contract = await connect("CoreValidator");
+    const password = randpassword();
+    const passwordHash = mimcHash(password).toString();
+    const group = await contract.createGroup(name, passwordHash);
+    return { password };
+  } catch (error) {
+    console.log(`createGroup Failed: ${error}`);
+  }
 }
 
 async function addGroupMember(
@@ -99,79 +110,95 @@ async function addGroupMember(
   passwordProof,
   passwordPublicSignals
 ) {
-  const contract = await connect("CoreValidator");
-  const keyOutput = processProof(
-    keyProof,
-    keyPublicSignals.map((x) => modPBigIntNative(x))
-  );
-  const passwordOutput = processProof(
-    passwordProof,
-    passwordPublicSignals.map((x) => modPBigIntNative(x))
-  );
-  const registration = await contract.verifyAndStoreRegistration(
-    ...keyOutput,
-    ...passwordOutput,
-    name
-  )
-  .catch(err => {
-    console.log(err);
-  });
-  return !!registration;
+  try {
+    const contract = await connect("CoreValidator");
+    const keyOutput = processProof(
+      keyProof,
+      keyPublicSignals.map((x) => modPBigIntNative(x))
+    );
+    const passwordOutput = processProof(
+      passwordProof,
+      passwordPublicSignals.map((x) => modPBigIntNative(x))
+    );
+    const registration = await contract.verifyAndStoreRegistration(
+      ...keyOutput,
+      ...passwordOutput,
+      name
+    )
+    return !!registration;
+  } catch (error) {
+    console.log(`addGroup Failed: ${error}`);
+  }
 }
 
 async function recordConfession(message, proof, publicSignals, name) {
-  const contract = await connect("CoreValidator");
-  const output = processProof(
-    proof,
-    publicSignals.map((x) => modPBigIntNative(x))
-  );
-  const confession = await contract.verifyAndAddMessage(
-    ...output,
-    message,
-    name
-  )
-  .catch(err => {
-    console.log(err);
-  });
-  return !!confession;
+  console.log('recordConfession');
+  try {
+    const contract = await connect("CoreValidator");
+    const output = processProof(
+      proof,
+      publicSignals.map((x) => modPBigIntNative(x))
+    );
+    const confession = await contract.verifyAndAddMessage(
+      ...output,
+      message,
+      name
+    )
+    console.log(confession);
+    return !!confession;
+  } catch (error) {
+    console.log(`recordConfession Failed: ${error}`);
+  }
 }
 
 async function getGroupHashes(name) {
-  const contract = await connect("CoreValidator");
-  const groups = await contract.getAllHashedUsersByGroupName(name);
-  const parsedGroups = groups.map((group) => {
-    return group.toString();
-  });
-  return parsedGroups;
+  try {
+    const contract = await connect("CoreValidator");
+    const groups = await contract.getAllHashedUsersByGroupName(name);
+    const parsedGroups = groups.map((group) => {
+      return group.toString();
+    });
+    return parsedGroups;
+  } catch (error) {
+    console.log(`getGroupHashes Failed: ${error}`);
+  }
 }
 
 async function getGroups() {
-  const contract = await connect("CoreValidator");
-  const groups = await contract.getGroups();
-  const parsedGroups = groups.map((group) => {
-    return {
-      name: group.name,
-      passwordHash: group.passwordHash.toString(),
-      users: group.users,
-    };
-  });
-  const filteredGroups = parsedGroups.filter((group) => group.passwordHash !== '0');
-  return filteredGroups;
+  try {
+    const contract = await connect("CoreValidator");
+    const groups = await contract.getGroups();
+    const parsedGroups = groups.map((group) => {
+      return {
+        name: group.name,
+        passwordHash: group.passwordHash.toString(),
+        users: group.users,
+      };
+    });
+    const filteredGroups = parsedGroups.filter((group) => group.passwordHash !== '0');
+    return filteredGroups;
+  } catch (error) {
+    console.log(`getGroups Failed: ${error}`);
+  }
 }
 
 async function getConfessions() {
-  const contract = await connect("CoreValidator");
-  const confessions = await contract.getConfessions(); // update
-  const parsedConfessions = confessions.map((confession) => {
-    return {
-      id: confession.id.toString(),
-      message: confession.text,
-      group: confession.group,
-    };
-  });
-  const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
-  const sortedConfessions = filteredConfessions.sort((a, b) => b.id - a.id);
-  return sortedConfessions;
+  try {
+    const contract = await connect("CoreValidator");
+    const confessions = await contract.getConfessions({ from: '0xB793e17E53e21e8eE6f191E6f48bbbd09DD6B574' });
+    const parsedConfessions = confessions.map((confession) => {
+      return {
+        id: confession.id.toString(),
+        message: confession.text,
+        group: confession.group,
+      };
+    });
+    const filteredConfessions = parsedConfessions.filter(confession => confession.group !== '');
+    const sortedConfessions = filteredConfessions.sort((a, b) => b.id - a.id);
+    return sortedConfessions;
+  } catch (error) {
+    console.log(`getConfessions Failed: ${error}`);
+  }
 }
 
 

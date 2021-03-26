@@ -4,6 +4,13 @@ A public message board, hosted on a solidity contract, that uses ZK-SNARKS to al
 
 ## Setup and Run
 
+Use Node v14. If you don't have it, do:
+
+```
+nvm install 14.15.3
+npm -v # 14.15.3
+```
+
 Start your own hardhat chain
 
 ```
@@ -11,7 +18,6 @@ yarn chain
 ```
 
 Use Node v14
-
 ```
 nvm use 14.15.3
 npm install
@@ -31,6 +37,8 @@ Run the local server and client watcher
 ```
 npm run dev
 ```
+
+View localhost:8080
 
 ## Circuits
 
@@ -129,8 +137,12 @@ Run `./solbuilder.js` to generate Solidity from the contracts.
 ## How it works
 
 1. User generates EdDSA key pair `(pk, sk)` and sends the MiMC hash to the server `H(pk)`.
-2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have the public key `pk` to one of the recorded MiMC hashes.
+2. To vote, the user first proves they're registered to the poll by sending a snark proving that they have a public key `pk` to one of the recorded MiMC hashes.
 3. Then, the user sends an EdDSA signature of the vote and a snark proving that the signature was produced by the private key associated with the public key they just verified.
+
+Valid `sig = EdDSA(sk, msg)`
+where `pk = private2public(sk)`
+and `H(pk)` is a recorded hash
 
 ## Poll Database
 
@@ -149,6 +161,10 @@ Each line after this is a MiMC hash of a user who registered with the poll.
 ```
 VOTE,SIGNATURE
 ```
+
+## Environment Variables
+
+.env has a beacon to do the MPC. Also, node_env can be development which simply queries the local hardhat chain, or production which queries ropsten.
 
 ## Common Errors
 

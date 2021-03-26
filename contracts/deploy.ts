@@ -113,6 +113,7 @@ async function deploy(fileName, libraries = []) {
         })
       );
       
+      console.log(name, contractObject.address);
       return { name, bytecode, abi, address: contractObject.address };
     } catch (err) {
       console.log(err);

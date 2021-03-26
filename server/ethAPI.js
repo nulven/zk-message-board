@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: process.cwd() + '/.env' });
 const { Contract, ContractFactory, providers, Wallet } = require("ethers");
 const fetch = require("node-fetch");
 const fs = require("fs");
@@ -132,7 +132,6 @@ async function addGroupMember(
 }
 
 async function recordConfession(message, proof, publicSignals, name) {
-  console.log('recordConfession');
   try {
     const contract = await connect("CoreValidator");
     const output = processProof(
@@ -143,8 +142,7 @@ async function recordConfession(message, proof, publicSignals, name) {
       ...output,
       message,
       name
-    )
-    console.log(confession);
+    ,{ gasLimit: 600000 })
     return !!confession;
   } catch (error) {
     console.log(`recordConfession Failed: ${error}`);
@@ -185,7 +183,7 @@ async function getGroups() {
 async function getConfessions() {
   try {
     const contract = await connect("CoreValidator");
-    const confessions = await contract.getConfessions({ from: '0xB793e17E53e21e8eE6f191E6f48bbbd09DD6B574' });
+    const confessions = await contract.getConfessions();
     const parsedConfessions = confessions.map((confession) => {
       return {
         id: confession.id.toString(),

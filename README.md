@@ -1,4 +1,6 @@
-# ZK MiMC Hash Verifier
+# Zero Knowledge Message Board
+
+A public message board, hosted on a solidity contract, that uses ZK-SNARKS to allow a user to register their identity as a member of a group and post messages on behalf of the group without revealing their identity. Currently, this implementation is only semi-decentralized as it uses a central server to send the transactions on behalf of the user, but there are ways to change this with a little more effort.
 
 ## Setup and Run
 
@@ -34,9 +36,23 @@ npm run dev
 
 | Circuit Name | Private Inputs | Public Inputs              | Outputs | Description                                                                                           |
 | ------------ | -------------- | -------------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
-| `hash`       | `x`            | `hash`                     | `out`   | Checks if `MiMC(x) = hash`; outputs `MiMC(x)`                                                         |
-| `hash-check` | `key`          | `hashes`                   | None    | Checks if `MiMC(x)` is in list `hashes`                                                               |
+| `hash-check`       | `x`            | `hash`                     | `out`   | Checks if `MiMC(x) = hash`; outputs `MiMC(x)`                                                         |
+| `hash-check-bits` | `x` (256-bit list) | `hash`                   | `out` | Checks if `MiMC(x) = hash`; outputs `MiMC(x)`                                                               |
 | `sig-check`  | `publicKey`    | `hashes`, `sig`, `message` | None    | Checks `eddsa_verify(publicKey, sig, message) == true`; checks `MiMIC(publicKey)` is in list `hashes` |
+
+### 'hash-check'
+
+| Inputs      | Private | Type               | Description                                           |
+| ----------- | ------- | ------------------ | ----------------------------------------------------- |
+| 'x' | Yes     | 256-bit integer            | MiMC hash pre-image |
+| 'hash'    | No      | 256-bit integer      | MiMC hash |
+
+### 'hash-check-bits'
+
+| Inputs      | Private | Type               | Description                                           |
+| ----------- | ------- | ------------------ | ----------------------------------------------------- |
+| 'x' | Yes     | 256-bit array            | MiMC hash pre-image |
+| 'hash'    | No      |  256-bit integer     | MiMC hash |
 
 ### 'sig-check'
 

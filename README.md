@@ -165,33 +165,3 @@ Run `./solbuilder.js` to generate Solidity from the contracts.
 Valid `sig = EdDSA(sk, msg)`
 where `pk = private2public(sk)`
 and `H(pk)` is a recorded hash
-
-## Poll Database
-
-All of the poll information is stored locally in `.txt` files.
-
-`/server/polls` stores the data in separate files named `POLL_ID.txt`, where the first line is as follows
-
-```
-POLL_ID,TITLE,MAX_USERS
-```
-
-Each line after this is a MiMC hash of a user who registered with the poll.
-
-`/server/votes` stores the vote in separate files named `POLL_ID.txt`, where each line represents one vote
-
-```
-VOTE,SIGNATURE
-```
-
-## Environment Variables
-
-.env has a beacon to do the MPC. Also, node_env can be development which simply queries the local hardhat chain, or production which queries ropsten.
-
-## Common Errors
-
-```
-When I call a contract from frontend, some path doesnt work -- I see 'call revert exception' or 'calling an account which is not a contract'
-```
-
-The chain probably doesn't know the contract address. In our experience, restarting chain and redeploying has worked for us.

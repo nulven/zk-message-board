@@ -2,7 +2,7 @@
 
 A public message board, hosted on a solidity contract, that uses ZK-SNARKS to allow a user to register their identity as a member of a group and post messages on behalf of the group without revealing their identity. Currently, this implementation is only semi-decentralized as it uses a central server to send the transactions on behalf of the user, but there are ways to change this with a little more effort.
 
-## Setup and Run
+## Setup
 
 Use Node v14. If you don't have it, do:
 
@@ -11,31 +11,53 @@ nvm install 14.15.3
 npm -v # 14.15.3
 ```
 
-Start your own hardhat chain
-
+Install dependencis
 ```
-yarn chain
-```
-
-Use Node v14
-```
-nvm use 14.15.3
-npm install
-cd contracts
-node deploy.ts
-cd ..
-npm run compile-dev hash-check 15
-npm run compile-dev hash-check-bits 20
-npm run compile-dev sig-check 20
-npm run compile hash-check 15
-npm run compile hash-check-bits 20
-npm run compile sig-check 20
+yarn
 ```
 
-Run the local server and client watcher
+## Run
 
+### Compile circuits and contracts
+
+Compile the circuits to create the witness and keys
 ```
-npm run dev
+yarn compile hash-check 15
+yarn compile hash-check-bits 20
+yarn compile sig-check 20
+```
+
+Create the `Verifier` library with the SNARK verification keys
+```
+yarn compile:verifier
+```
+
+Compile the solidity contracts
+```
+yarn compile:solidity
+```
+
+### Deploy Contracts and run the client
+
+#### Local
+Deploy the contracts
+```
+yarn deploy:local
+```
+
+Run the client watcher and http server
+```
+yarn dev
+```
+
+#### Ropsten
+Deploy the contracts
+```
+yarn deploy:ropsten
+```
+Run the client watcher and http server
+```
+yarn prod
 ```
 
 View localhost:8080

@@ -3,7 +3,7 @@
     "jsx": "react",
     "outDir": "./dist/",
     "esModuleInterop": true,
-    "module": "es6",
+    "module": "commonjs",
     "target": "es6",
     "allowJs": true,
     "skipLibCheck": true,
@@ -15,7 +15,8 @@
     "noImplicitThis": false
   },
   "include": [
-    "client/src/*"
+    "*.ts",
+    "**/*.ts"
   ],
   "exclude": [
     "node_modules"

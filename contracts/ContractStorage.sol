@@ -1,5 +1,5 @@
 // ctrll pagedn pageup
-pragma solidity 0.7.6; // >=0.5.16 <=
+pragma solidity ^0.8.3;
 pragma experimental ABIEncoderV2;
 
 contract ContractStorage {
@@ -10,7 +10,6 @@ contract ContractStorage {
   // Should match the number of users in the sig-check contract
   uint256 public constant MAX_USERS = 10;
   uint256 public constant MAX_GROUPS = 10;
-  uint256 public constant MAX_CONFESSIONS = 10;
 
   // maps generated message ids to group names
   struct Message {
@@ -20,8 +19,7 @@ contract ContractStorage {
     bool verified;
   }
   // Maps contiguous confession ids to messages
-  Message[MAX_CONFESSIONS] public confessions;
-  uint256 public confessionCount = 1;
+  Message[] public confessions;
 
   // maps group names to hash of public keys
   struct Group {

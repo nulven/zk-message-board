@@ -5,9 +5,6 @@ import TextInput from '../components/TextInput';
 import { Button } from '../components/Button';
 import { Large } from '../components/text';
 
-import { proveSignature, verifyHash, verifySignature } from '../utils/prover';
-import { post } from '../utils/api';
-
 
 const ConfessionWrapper = styled.div`
   display: flex;

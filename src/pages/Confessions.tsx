@@ -26,14 +26,8 @@ const Confessions = (props) => {
   const [confessions, setConfessions] = useState([]);
 
   useEffect(() => {
-    loadConfessions();
+    eth.api.getConfessions().then(setConfessions);
   }, []);
-
-  const loadConfessions = () => {
-    eth.api.getConfessions().then(confessions => {
-      setConfessions(confessions);
-    });
-  };
 
   const sendToPoll = (id) => () => {
     props.history.push(`/polls/${id}`);

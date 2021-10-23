@@ -1,56 +1,83 @@
-// params is given as a JSON
-export function get(endpoint, headers) {
-  return fetch(endpoint, {headers: headers}).then(res => {
-    if(res.ok){
-      return res.json()
-    } else{
-      return res
-    }
-  });;
-}
+import {
+  signMessage,
+  hash,
+  prepareHashBitsInput,
+} from './crypto';
+import {
+  proveHash,
+  proveHashBits,
+  proveSignature,
+  verifyHash,
+  verifySignature,
+} from './prover';
+import { generateKey } from './utils';
+import eth from './ethAPI';
 
-//make sure headers includes 'Content-type': 'application/json'
-export function post(endpoint, params) {
-  return fetch(endpoint, {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(params)
-  }).then(res => {
-    if(res.ok){
-      return res.json()
-    } else{
-      return res
+export async function createMessage(
+  message: string,
+  privateKey: BigInt,
+  publicKey: BigInt[],
+  group: string,
+) {
+  const {
+    pubKey,
+    sigR8,
+    sigR8Halves,
+    sigS,
+    m,
+  } = signMessage(message, privateKey, publicKey);
+
+  eth.api.getGroupHashes(group).then(async (hashes) => {
+    const proof = await proveSignature(
+      pubKey,
+      hashes,
+      sigR8,
+      sigR8Halves,
+      sigS,
+      m,
+    );
+    const verified = await verifySignature(proof);
+    if (verified) {
+      console.log('Valid Proof');
+    } else {
+      console.log('Invalid Proof');
     }
+
+    eth.api.recordConfession(
+      message,
+      proof.proof,
+      proof.publicSignals,
+      group,
+    );
   });
 }
 
-export function put(endpoint, params) {
-  return fetch(endpoint, {
-    method: 'put',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(params)
-  }).then(res => {
-    if(res.ok){
-      return res.json()
-    } else{
-      return res
+export async function registerUser(password: BigInt, group: any): Promise<any> {
+  const passwordHash = hash(password).toString();
+  return new Promise(async (resolve, reject) => {
+    if (passwordHash === group.passwordHash) {
+      const passwordProof = await proveHash(password, passwordHash);
+
+      const { publicKey, privateKey } = generateKey();
+      const aBits = prepareHashBitsInput(publicKey);
+      const _hash = hash(...aBits).toString();
+      const keyProof = await proveHashBits(aBits, _hash);
+
+      eth.api.addGroupMember(
+        name,
+        keyProof.proof,
+        keyProof.publicSignals,
+        passwordProof.proof,
+        passwordProof.publicSignals,
+      )
+      .then(() => {
+        resolve({
+          publicKey,
+          privateKey,
+        });
+      });
+    } else {
+      reject('Incorrect password');
     }
   });
-}
-
-export function getJsonFromUrl(url) {
-  if(!url) url = location.search;
-  var query = url.substr(1);
-  var result = {};
-  query.split("&").forEach(function(part) {
-    var item = part.split("=");
-    result[item[0]] = decodeURIComponent(item[1]);
-  });
-  return result;
 }

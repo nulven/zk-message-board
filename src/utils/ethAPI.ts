@@ -131,15 +131,19 @@ class EthAPI {
     functions.forEach(key => {
       const prop = this[key];
       if (typeof prop === 'function') {
-        this[key.slice(1)] = (...args) => {
+        const func = (...args) => {
           if (this.contract) {
             return this.wrapper(this[key].bind(this))(...args);
           } else {
-            return new Promise((resolve, reject) => {
-              reject('this');
+            return new Promise(resolve => {
+              const x = setTimeout(() => {
+                const res = func(...args);
+                resolve(res);
+              }, 50);
             });
           }
         };
+        this[key.slice(1)] = func;
       }
     });
   }

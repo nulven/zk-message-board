@@ -6,13 +6,11 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { providers } from 'ethers';
 
 import Page from './Page';
-import Home from './Home';
-import Hash from './Hash';
-import NewGroup from './NewGroup';
-import Group from './Group';
-import Groups from './Groups';
-import NewConfession from './NewConfession';
-import Confessions from './Confessions';
+import NewGroup from '../pages/NewGroup';
+import Group from '../pages/Group';
+import Groups from '../pages/Groups';
+import NewConfession from '../pages/NewConfession';
+import Confessions from '../pages/Confessions';
 
 import config from '../../config';
 
@@ -116,7 +114,7 @@ const App = () => {
         />
         <Page
           path="/"
-          Subpage={Home}
+          Subpage={Groups}
           navbar={true}
           signer={signer}
           web3={web3Modal}

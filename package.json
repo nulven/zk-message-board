@@ -4,8 +4,9 @@
   "description": "",
   "main": "./client/index.tsx",
   "scripts": {
-    "build": "$(npm bin)/webpack --mode development ",
     "build:config": "npx ts-node ./scripts/buildConfig.ts",
+    "build:webpack": "$(npm bin)/webpack --mode development ",
+    "build": "yarn build:config && yarn build:webpack",
     "babel": "babel --presets es2015 client/index.js -o ./lib/index.js",
     "chain": "hardhat chain",
     "client": "yarn build:config && webpack-dev-server --mode development --hot --inline --content-base=dist --history-api-fallback",

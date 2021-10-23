@@ -1,0 +1,18 @@
+name: Build webpack
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: echo NODE_ENV=production >> .env
+      - run: echo NETWORK='ropsten' >> .env
+      - run: yarn
+      - run: yarn build
+      - run: echo privatenfts.xyz >> ./dist/CNAME
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./dist

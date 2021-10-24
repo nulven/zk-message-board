@@ -12,7 +12,6 @@ jobs:
       - run: echo NODE_ENV=production >> .env
       - run: echo NETWORK='ropsten' >> .env
       - run: yarn
-      - run: yarn compile:solidity
       - run: yarn build
       - run: echo confessions.digital >> ./dist/CNAME
       - uses: peaceiris/actions-gh-pages@v3

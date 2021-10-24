@@ -4,7 +4,6 @@ node_modules
 dist
 compiledCircuits
 cache
-artifacts
 deployments/localhost
 typechain
 public/circuits

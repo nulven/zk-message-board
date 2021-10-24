@@ -62,7 +62,6 @@
     "express": "^4.17.1",
     "extract-loader": "^5.1.0",
     "ffjavascript": "^0.2.39",
-    "http-server": "^14.0.0",
     "mini-css-extract-plugin": "^0.9.0",
     "next": "^9.4.4",
     "node-fetch": "^2.6.0",

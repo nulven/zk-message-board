@@ -11,6 +11,7 @@ jobs:
           node-version: '14'
       - run: echo NODE_ENV=production >> .env
       - run: echo NETWORK='ropsten' >> .env
+      - run: echo beacon=69420753206121746f776e206f652deadbeef69420 >> .env
       - run: yarn
       - run: wget https://powers-of-tau.s3.amazonaws.com/pots.zip
       - run: unzip pots.zip

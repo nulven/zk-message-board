@@ -5,6 +5,7 @@ dist
 cache
 deployments/localhost
 typechain
+compiledCircuits
 public/circuits
 public/contracts
 circuits/pots

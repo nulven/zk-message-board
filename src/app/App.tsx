@@ -16,7 +16,6 @@ import config from '../../config';
 
 import eth from '../utils/ethAPI';
 
-const INFURA_ID = config.infuraId;
 const network = config.network;
 
 const web3Modal = new Web3Modal({

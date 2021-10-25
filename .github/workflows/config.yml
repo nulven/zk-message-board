@@ -12,6 +12,11 @@ jobs:
       - run: echo NODE_ENV=production >> .env
       - run: echo NETWORK='ropsten' >> .env
       - run: yarn
+      - run: wget https://powers-of-tau.s3.amazonaws.com/pots.zip
+      - run: unzip pots.zip
+      - run: yarn compile:circom sig-check 20
+      - run: yarn compile:circom hash-check 15
+      - run: yarn compile:circom hash-check-bits 20
       - run: yarn build
       - run: echo confessions.digital >> ./dist/CNAME
       - uses: peaceiris/actions-gh-pages@v3

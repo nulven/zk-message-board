@@ -5,11 +5,6 @@ import styled from 'styled-components';
 import NavigationBar from './NavigationBar';
 import OurThemeProvider from './OurThemeProvider';
 
-const defaultTitle = '';
-
-const SubpageWrapper = styled.div`
-  height: calc(100% - 56px - 1px);
-`;
 
 interface Props {
   path: string;
@@ -24,7 +19,7 @@ export default function Page(props: Props) {
 
   useEffect(() => {
     if (document) {
-      const title = path;
+      const title = 'Message Board';
       const titleType = typeof title;
       document.title = title;
     }
@@ -36,9 +31,7 @@ export default function Page(props: Props) {
       render={(props: any) => (
         <OurThemeProvider>
           <NavigationBar activeTab={path} />
-          <SubpageWrapper>
-            <Subpage {...props} />
-          </SubpageWrapper>
+          <Subpage {...props} />
         </OurThemeProvider>
       )}
     />

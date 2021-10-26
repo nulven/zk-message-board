@@ -1,7 +1,7 @@
 export function saveGroup(group: any, publicKey: any, privateKey: BigInt): void {
   localStorage.setItem(`${group.name}_publicKey`, publicKey);
   localStorage.setItem(`${group.name}_privateKey`, privateKey.toString());
-  const groups = localStorage.getItem(`groups`).split(',');
+  const groups = loadGroups();
   const newGroups = [...groups, group.name];
   localStorage.setItem(`groups`,newGroups.toString());
 }
@@ -31,5 +31,7 @@ export function loadGroups(): string[] {
     } else {
       console.log('You are not a member of any group');
     }
+  } else {
+    return [];
   }
 }

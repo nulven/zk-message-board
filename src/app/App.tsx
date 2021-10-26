@@ -74,7 +74,7 @@ const App = () => {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         <Page
           path="/confessions/new"
@@ -119,7 +119,7 @@ const App = () => {
           web3={web3Modal}
         />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

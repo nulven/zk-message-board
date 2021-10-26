@@ -1,8 +1,8 @@
-export function saveGroup(group: string, publicKey: any, privateKey: BigInt): void {
-  localStorage.setItem(`${name}_publicKey`, publicKey);
-  localStorage.setItem(`${name}_privateKey`, privateKey.toString());
+export function saveGroup(group: any, publicKey: any, privateKey: BigInt): void {
+  localStorage.setItem(`${group.name}_publicKey`, publicKey);
+  localStorage.setItem(`${group.name}_privateKey`, privateKey.toString());
   const groups = localStorage.getItem(`groups`).split(',');
-  const newGroups = [...groups, group];
+  const newGroups = [...groups, group.name];
   localStorage.setItem(`groups`,newGroups.toString());
 }
   
@@ -18,6 +18,8 @@ export function loadGroup(group: string) {
     } else {
       console.log('Key is not valid');
     }
+  } else {
+    return { publicKey: null, privateKey: null };
   }
 };
 

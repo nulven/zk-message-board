@@ -10,3 +10,4 @@ public/circuits
 public/contracts
 circuits/pots
 circuits/**/public.json
+config/config.json

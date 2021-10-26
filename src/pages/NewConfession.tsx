@@ -54,7 +54,9 @@ const NewConfession = (props) => {
     setGroups(loadGroups());
   }, []);
   useEffect(() => {
-    loadKeys();
+    if (group) {
+      loadKeys();
+    }
   }, [group]);
 
   const loadKeys = async () => {

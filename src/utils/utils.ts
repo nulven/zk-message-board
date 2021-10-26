@@ -11,5 +11,5 @@ export function generateKey() {
 }
 
 export function randpassword() {
-  return Math.floor(Math.random() * 100000000000);
+  return Math.floor(Math.random() * 100000000000).toString();
 }

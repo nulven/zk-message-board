@@ -48,7 +48,7 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory keyA,
     uint256[2][2] memory keyB,
     uint256[2] memory keyC,
-    uint256[2] memory keyInput,
+    uint256[1] memory keyInput,
     uint256[2] memory passwordA,
     uint256[2][2] memory passwordB,
     uint256[2] memory passwordC,

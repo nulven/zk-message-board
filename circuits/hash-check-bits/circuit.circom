@@ -2,7 +2,6 @@ include "../../node_modules/circomlib/circuits/mimcsponge.circom"
 
 template Main() {
   signal private input x[256];
-  signal input hash;
 
   signal output out;
 
@@ -13,8 +12,6 @@ template Main() {
   mimc.k <== 0;
 
   out <== mimc.outs[0];
-
-  out === hash;
 }
 
 component main = Main();

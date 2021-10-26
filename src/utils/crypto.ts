@@ -57,8 +57,8 @@ export function signMessage(message: string, privateKey: BigInt, publicKey: BigI
   };
 }
 
-export function hash(preimage?: any): BigInt {
-  return BigInt(mimc(preimage));
+export function hash(...preimage: any[]) {
+  return mimc(...preimage);
 }
 
 export function prepareHashBitsInput(publicKey) {

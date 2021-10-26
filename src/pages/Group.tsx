@@ -10,7 +10,7 @@ import Spinner from '../components/Spinner';
 import { Button } from '../components/Button';
 import { Large, Medium } from '../components/text';
 
-import { saveGroup, loadGroup } from '../utils/storage';
+import { loadGroup } from '../utils/storage';
 import { registerUser } from '../utils/api';
 
 const Wrapper = styled.div`

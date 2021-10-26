@@ -48,8 +48,8 @@ export async function proveHash(preImage, hash) {
   return prove('hash-check', { x: preImage, hash });
 }
 
-export async function proveHashBits(preImage, hash) {
-  return prove('hash-check-bits', { x: preImage, hash });
+export async function proveHashBits(preImage) {
+  return prove('hash-check-bits', { x: preImage });
 }
 
 export async function proveSignature(

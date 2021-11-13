@@ -1,41 +1,43 @@
-import "@nomiclabs/hardhat-waffle";
-import "@typechain/hardhat";
-import "hardhat-gas-reporter";
-import "solidity-coverage";
-import "@nomiclabs/hardhat-ethers";
-import "@nomiclabs/hardhat-etherscan";
+import '@nomiclabs/hardhat-waffle';
+import '@typechain/hardhat';
+import 'hardhat-gas-reporter';
+import 'solidity-coverage';
+import '@nomiclabs/hardhat-ethers';
+import '@nomiclabs/hardhat-etherscan';
 
-import { config as dotenvConfig } from "dotenv";
-import { HardhatUserConfig } from "hardhat/config";
-import { NetworkUserConfig } from "hardhat/types";
-import { resolve } from "path";
+import { config as dotenvConfig } from 'dotenv';
+import { HardhatUserConfig } from 'hardhat/config';
+import { NetworkUserConfig } from 'hardhat/types';
+import { resolve } from 'path';
 
-import "./scripts/deploy";
+import './scripts/deploy';
 
-dotenvConfig({ path: resolve(__dirname, "./.env") });
+dotenvConfig({ path: resolve(__dirname, './.env') });
 
 const chainIds = {
-  goerli: 5,
-  hardhat: 31337,
-  kovan: 42,
   mainnet: 1,
-  rinkeby: 4,
   ropsten: 3,
+  rinkeby: 4,
+  goerli: 5,
+  kovan: 42,
 };
+
+type ChainName = keyof typeof chainIds;
 
 // Ensure that we have all the environment variables we need.
 const mnemonic: string | undefined = process.env.MNEMONIC;
 if (!mnemonic) {
-  throw new Error("Please set your MNEMONIC in a .env file");
+  throw new Error('Please set $MNEMONIC in a .env file');
 }
 
 const infuraApiKey: string | undefined = process.env.INFURA_API_KEY;
-if (!infuraApiKey) {
-  throw new Error("Please set your INFURA_API_KEY in a .env file");
-}
 
-function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = `https://${network}.infura.io/v3/${infuraApiKey}`;
+const getChainConfig = (network: ChainName): NetworkUserConfig => {
+  if (!infuraApiKey) {
+    console.debug(`Missing environment variable: $INFURA_API_KEY for ${network}`);
+  }
+  const url = `https://${network}.infura.io/v3/${infuraApiKey}`;
+
   return {
     accounts: {
       count: 10,
@@ -48,35 +50,27 @@ function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
 }
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "hardhat",
-  networks: {
-    // hardhat: {
-    //   accounts: {
-    //     mnemonic,
-    //   },
-    //   chainId: chainIds.hardhat,
-    // },
-    goerli: getChainConfig("goerli"),
-    ropsten: getChainConfig("ropsten"),
-    localhost: {
-      url: "http://127.0.0.1:8545",
-    },
-  },
+  defaultNetwork: 'hardhat',
+  networks: Object.fromEntries(
+    Object.keys(chainIds).map((name) => (
+      [name, getChainConfig(name as ChainName)]
+    ))
+  ),
   paths: {
-    artifacts: "./artifacts",
-    cache: "./cache",
-    sources: "./contracts",
-    tests: "./test",
+    artifacts: './artifacts',
+    cache: './cache',
+    sources: './contracts',
+    tests: './test',
   },
   solidity: {
     compilers: [
       {
-        version: "0.8.3",
+        version: '0.8.3',
         settings: {
           metadata: {
             // Not including the metadata hash
             // https://github.com/paulrberg/solidity-template/issues/31
-            bytecodeHash: "none",
+            bytecodeHash: 'none',
           },
           // Disable the optimizer when debugging
           // https://hardhat.org/hardhat-network/#solidity-optimizer-support
@@ -87,12 +81,12 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        version: "0.6.11",
+        version: '0.6.11',
         settings: {
           metadata: {
             // Not including the metadata hash
             // https://github.com/paulrberg/solidity-template/issues/31
-            bytecodeHash: "none",
+            bytecodeHash: 'none',
           },
           // Disable the optimizer when debugging
           // https://hardhat.org/hardhat-network/#solidity-optimizer-support
@@ -106,8 +100,8 @@ const config: HardhatUserConfig = {
   },
   /*
   typechain: {
-    outDir: "typechain",
-    target: "ethers-v5",
+    outDir: 'typechain',
+    target: 'ethers-v5',
   },
   */
   etherscan: {

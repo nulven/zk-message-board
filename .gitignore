@@ -1,13 +1,3 @@
 .env
-node_modules
-
-dist
-cache
-deployments/localhost
-typechain
-compiledCircuits
-public/circuits
-public/contracts
-circuits/pots
-circuits/**/public.json
-config/config.json
+node_modules/
+build/

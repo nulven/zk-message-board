@@ -4,7 +4,7 @@
     "outDir": "./dist/",
     "esModuleInterop": true,
     "module": "commonjs",
-    "target": "es6",
+    "target": "es2019",
     "allowJs": true,
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,

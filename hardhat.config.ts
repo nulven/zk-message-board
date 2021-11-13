@@ -22,6 +22,8 @@ const chainIds = {
   kovan: 42,
 };
 
+type ChainName = keyof typeof chainIds;
+
 // Ensure that we have all the environment variables we need.
 const mnemonic: string | undefined = process.env.MNEMONIC;
 if (!mnemonic) {
@@ -30,7 +32,7 @@ if (!mnemonic) {
 
 const infuraApiKey: string | undefined = process.env.INFURA_API_KEY;
 
-function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
+const getChainConfig = (network: ChainName): NetworkUserConfig => {
   if (!infuraApiKey) {
     console.debug(`Missing environment variable: $INFURA_API_KEY for ${network}`);
   }
@@ -49,10 +51,11 @@ function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
-  networks: {
-    goerli: getChainConfig('goerli'),
-    ropsten: getChainConfig('ropsten'),
-  },
+  networks: Object.fromEntries(
+    Object.keys(chainIds).map((name) => (
+      [name, getChainConfig(name as ChainName)]
+    ))
+  ),
   paths: {
     artifacts: './artifacts',
     cache: './cache',

@@ -27,8 +27,7 @@ Install dependencies:
 Compile the circuits to create the witness and keys:
 
 * `yarn compile:circuits -c hash-check -p 15`
-* `yarn compile:circuits -c hash-check-bits -p 20`
-* `yarn compile:circuits -c sig-check -p 20`
+* `yarn compile:circuits -c hash-check-bits,sig-check -p 20`
 
 Create the `Verifier` library with the SNARK verification keys:
 

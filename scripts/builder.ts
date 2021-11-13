@@ -117,7 +117,10 @@ if(circuitsParam === '${circuitsDir}/*') {
 let circuits
 
 if(circuitsParam.includes(',')) {
-  circuits = circuits.split(/,/g)
+  circuits = (
+    circuitsParam.split(/,/g)
+    .map((circuit) => path.join(circuitsDir, circuit))
+  )
 } else {
   if(
     !circuitsParam.startsWith('/')
@@ -250,33 +253,34 @@ for (const source of circuits) {
       exec(`npx snarkjs powersoftau verify "${potIn}"`)
     }
 
-    const keyOut = path.join(keyDir, 'circuit.zkey')
+    const keyOut = path.join(keyDir, 'circuit_0000.zkey')
 
     if(exists(keyOut)) {
       console.info(`Skipping Generation Of: ${keyOut}`)
     } else {
       fs.mkdirSync(keyDir, { recursive: true })
       exec(
-        'npx snarkjs zkey new '
+        'npx snarkjs groth16 setup '
         + `"${r1csOut}" "${potIn}" "${keyOut}"`
       )
     }
 
-    const newKeyOut = path.join(keyDir, 'new_circuit.zkey')
+    const contribKeyOut = path.join(keyDir, 'circuit.zkey')
 
-    if(exists(newKeyOut)) {
-      console.info(`Skipping Generation Of: ${newKeyOut}`)
+    if(exists(contribKeyOut)) {
+      console.info(`Skipping Generation Of: ${contribKeyOut}`)
     } else {
       if(deterministic) {
         exec(
-          `npx snarkjs zkey beacon `
-          + `"${keyOut}" "${newKeyOut}" `
+          'npx snarkjs zkey beacon '
+          + `"${keyOut}" "${contribKeyOut}" `
           + `"${process.env.beacon}" 10`
         )
       } else {
         exec(
-          `npx snarkjs zkey contribute `
-          + `"${keyOut}" "${newKeyOut}" `
+          'npx snarkjs zkey contribute '
+          + `"${keyOut}" "${contribKeyOut}" `
+          + '--name="First Contribution" '
           + `-e="${Date.now()}"`
         )
       }
@@ -289,7 +293,7 @@ for (const source of circuits) {
     } else {
       exec(
         'npx snarkjs zkey export verificationkey '
-        + `"${newKeyOut}" "${verifyKeyOut}"`
+        + `"${contribKeyOut}" "${verifyKeyOut}"`
       )
     }
 
@@ -301,8 +305,8 @@ for (const source of circuits) {
       console.info(`Skipping Generation Of: ${witnessOut}`)
     } else {
       exec(
-        `node "${genScript}" "${wasmOut}" "${jsonIn}" `
-        + `"${witnessOut}"`
+        `node "${genScript}" "${wasmOut}" `
+        + `"${jsonIn}" "${witnessOut}"`
       )
     }
 
@@ -314,7 +318,7 @@ for (const source of circuits) {
     } else {
       exec(
         'npx snarkjs groth16 prove '
-        + `"${newKeyOut}" "${witnessOut}" `
+        + `"${contribKeyOut}" "${witnessOut}" `
         + `"${proofOut}" "${pubOut}"`
       )
     }

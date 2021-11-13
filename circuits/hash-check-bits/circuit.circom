@@ -4,7 +4,6 @@ include "../../node_modules/circomlib/circuits/mimcsponge.circom";
 
 template Main() {
   signal input x[256];
-
   signal output out;
 
   component mimc = MiMCSponge(256, 220, 1);

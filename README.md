@@ -20,11 +20,17 @@ yarn
 
 ### Compile circuits and contracts
 
+Get ptau files
+```
+curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_15.ptau ./pots/pot15_final.ptau
+curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau ./pots/pot20_final.ptau
+```
+
 Compile the circuits to create the witness and keys
 ```
-yarn compile hash-check 15
-yarn compile hash-check-bits 20
-yarn compile sig-check 20
+yarn compile:circom hash-check 15
+yarn compile:circom hash-check-bits 20
+yarn compile:circom sig-check 20
 ```
 
 Create the `Verifier` library with the SNARK verification keys

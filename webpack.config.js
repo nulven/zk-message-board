@@ -4,8 +4,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components')
   .default;
 const styledComponentsTransformer = createStyledComponentsTransformer();
@@ -13,7 +11,7 @@ const styledComponentsTransformer = createStyledComponentsTransformer();
 module.exports = {
   mode: 'production',
   entry: {
-    'bundle.js': __dirname + '/client/src/index.tsx',
+    'bundle.js': __dirname + '/src/index.tsx',
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -24,8 +22,9 @@ module.exports = {
   // Enable sourcemaps for debugging webpack's output.
   devtool: 'source-map',
   devServer: {
-    port: 8081,
+    port: 5000,
     historyApiFallback: true,
+    publicPath: '/',
   },
 
   resolve: {
@@ -97,9 +96,6 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    //new HtmlWebpackPlugin({
-    //  template: './public/index.html',
-    //}),
     new CopyPlugin({
       patterns: [
         { from: 'public', to: '' }

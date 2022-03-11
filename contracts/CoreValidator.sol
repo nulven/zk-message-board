@@ -1,27 +1,22 @@
 // ctrll pagedn pageup
-pragma solidity 0.7.6; // >=0.5.16 <=
+pragma solidity ^0.8.3;
 pragma experimental ABIEncoderV2;
-import "./SigCheckVerifier.sol";
-import "./HashCheckVerifier.sol";
-import "./HashCheckBitsVerifier.sol";
+import "./Verifier.sol";
 import "./ContractStorage.sol";
-import "./Pairing.sol";
 
 // Validates messages and registrations
 contract CoreValidator is ContractStorage {
-  //////////////
-  ///  TYPES ///
-  //////////////
-  //   struct Proof {
-  //     Pairing.G1Point A;
-  //     Pairing.G2Point B;
-  //     Pairing.G1Point C;
-  //   }
   //////////////
   /// EVENTS ///
   //////////////
 
   event ProofVerified(uint256 pfsAccepted); // Question: use an event or an internal mapping?
+  
+  uint256 confessionCount;
+
+  constructor() public {
+    confessionCount = 0;
+  }
 
   ////////////////
   /// Messages  //
@@ -34,7 +29,7 @@ contract CoreValidator is ContractStorage {
     string memory message,
     string memory groupName
   ) public returns (bool) {
-    require(SigCheckVerifier.verifyProof(a, b, c, input), "Proof invalid!");
+    require(Verifier.verifySigCheckProof(a, b, c, input), "Proof invalid!");
     pfsVerified += 1;
     emit ProofVerified(pfsVerified);
 
@@ -53,7 +48,7 @@ contract CoreValidator is ContractStorage {
     uint256[2] memory keyA,
     uint256[2][2] memory keyB,
     uint256[2] memory keyC,
-    uint256[2] memory keyInput,
+    uint256[1] memory keyInput,
     uint256[2] memory passwordA,
     uint256[2][2] memory passwordB,
     uint256[2] memory passwordC,
@@ -65,11 +60,11 @@ contract CoreValidator is ContractStorage {
       "Wrong pass hash!"
     );
     require(
-      HashCheckBitsVerifier.verifyProof(keyA, keyB, keyC, keyInput),
+      Verifier.verifyHashCheckBitsProof(keyA, keyB, keyC, keyInput),
       "Key proof invalid!"
     );
     require(
-      HashCheckVerifier.verifyProof(
+      Verifier.verifyHashCheckProof(
         passwordA,
         passwordB,
         passwordC,
@@ -90,7 +85,7 @@ contract CoreValidator is ContractStorage {
     // Make new group
     require(!groupExists[groupName], "Group already exists!");
     require(groupCount < MAX_GROUPS, "Too many groups!");
-    Group storage newGroup;
+    Group memory newGroup;
     newGroup.passwordHash = passwordHash;
     newGroup.name = groupName;
     newGroup.userCount = 0;
@@ -116,12 +111,12 @@ contract CoreValidator is ContractStorage {
   function createMessage(string memory message, string memory groupName)
     public
   {
-    confessions[confessionCount] = Message({
-      id: confessionCount,
-      text: message,
-      group: groupName,
-      verified: false
-    });
+    Message memory _message;
+    _message.id = confessionCount;
+    _message.text = message;
+    _message.group = groupName;
+    _message.verified = false;
+    confessions.push(_message);
     confessionCount += 1;
   }
 
@@ -146,9 +141,14 @@ contract CoreValidator is ContractStorage {
   function getConfessions()
     public
     view
-    returns (Message[MAX_CONFESSIONS] memory)
+    returns (Message[] memory)
   {
-    return confessions;
+    uint256 count = confessionCount;
+    Message[] memory _confessions = new Message[](count);
+    for (uint256 i = 0; i < count; i++) {
+      _confessions[i] = confessions[i];
+    }
+    return _confessions;
   }
 
   function getConfessionByID(uint256 confessionID)

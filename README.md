@@ -22,8 +22,8 @@ yarn
 
 Get ptau files
 ```
-curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_15.ptau ./pots/pot15_final.ptau
-curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau ./pots/pot20_final.ptau
+curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_15.ptau --output ./pots/pot15_final.ptau
+curl https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_20.ptau --output ./pots/pot20_final.ptau
 ```
 
 Compile the circuits to create the witness and keys
